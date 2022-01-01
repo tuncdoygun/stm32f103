@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <stdint.h>
+
+#include "stm32f10x.h"
+#include "system.h"
+#include "lcdm.h"
+
+#define __STDIN          0 // standart in file handles
+#define __STDOUT         1
+#define __STDERR         2
+
+static volatile clock_t _tmTick;
+
+static const int _GPIO_Clocks[] = {
+  RCC_APB2Periph_GPIOA,
+  RCC_APB2Periph_GPIOB,
+  RCC_APB2Periph_GPIOC,
+  RCC_APB2Periph_GPIOD,
+  RCC_APB2Periph_GPIOE,
+  RCC_APB2Periph_GPIOF,
+  RCC_APB2Periph_GPIOG,
+};
+
+#define N_PORTS (sizeof(_GPIO_Clocks) / sizeof(*_GPIO_Clocks))
+
+void Sys_IoInit(void)
+{
+  int i;
+  
+  for(i = 0; i < N_PORTS; ++i) // Bütün GPIO Clock iþaretlerinin açýlmasý.Extreme güç tasarrufu gerekmediðinden hepsini enable etmek birþey deðiþtirmez
+    RCC_APB2PeriphClockCmd(_GPIO_Clocks[i], ENABLE);
+  
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE); // AFIO Clock
+  GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE); // JTAG disable.Biz STLINK kullandýðýmýzdan fazla pin kullanan JTAG'i disable ettik.
+}
+
+void Sys_ClockTick(void)
+{
+  // elapsed time counter.1 ms'de bir deðer 1 artacak.
+  ++_tmTick;
+}
+
+clock_t clock(void)
+{
+  return _tmTick;
+}
+
+void Sys_ClockInit(void)
+{
+  SysTick_Config(SystemCoreClock / CLOCKS_PER_SEC); // buraya verilen deðer geriye sarýlýyor.0'a ulaþýnca kesme oluyor.
+                                                    // Buradaki SystemCoreClock deðeri CLOCKS_PER_SEC'a bölünmeseydi 1 sn'de bir kesme oluþurdu.
+                                                    // Çünkü SystemCoreClock = 72 MHz, 1 saniyede 72 milyon pulse, 1 saniye sonra 0'a düþer deðer.
+                                                    // Biz burda CLOCKS_PER_SEC'a böldük böylece 1ms'de bir kesme olacak. 
+  
+                                                    // Kesme oluþtuðunda stm32f10x_it.c'deki SysTick_Handler fonksiyonu çalýþýr.
+}
+
+
+////////////////////////////////////////
+// KONSOL FONKSÝYONLARI
+
+void Sys_ConsoleInit()
+{
+  LCD_Init();
+}
+
+void __putch(unsigned char c)
+{
+  LCD_putch(c);
+}
+
+// printf'in nereye yazacaðýný belirtmek için alt seviyeli write callback fonksiyonunu bizim yazmamýz gerekiyor
+// biz yazmasak da printf fonksiyonu var.Normalde write fonksiyonu var fakat içi boþ,biz yazýyoruz. __weak olarak tanýmlý
+// çoðu derleyicide printf bu þekilde çalýþýr.Yani __write fonksiyonunu çaðýrýr.
+size_t __write(int handle, const unsigned char *buffer, size_t size)
+{
+  size_t nChars = 0;
+  
+  if (buffer == NULL)
+    return 0;
+  
+  if (handle != __STDOUT && handle != __STDERR)
+    return 0;
+  
+  while(size--) {
+    __putch(*buffer++);
+    ++nChars;
+  }
+  
+  return nChars;
+}
