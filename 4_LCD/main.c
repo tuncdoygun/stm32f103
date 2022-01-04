@@ -114,13 +114,13 @@ int main()
   
   printf("Hello World\n"); // dizi yerine bu fonksiyonu kullandýðýmýzda printf'in özelliklerinden mahrum kalmýþ olur.format specifier gibi þeyleri kullanamzdýk.
  
-  /* 05.08.2021
+  //05.08.2021
   printf("\rBirinci SATIR");
   printf("\nikinci SATIR");
   printf("\f"); // temizle
   printf("\r1. SATIR");
   printf("\n2. SATIR");
-  */
+  
   
   /* 03.08.2021
   LCD_DisplayOn(LCD_MODE_ON | LCD_MODE_CURSOR);

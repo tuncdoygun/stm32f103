@@ -9,5 +9,6 @@ void LCD_Init(void);
 void LCD_PutChar(unsigned char c);
 void LCD_SetCursor(unsigned int pos);
 void LCD_DisplayOn(unsigned char mode);
+void LCD_putch(unsigned char c);
 
 #endif
