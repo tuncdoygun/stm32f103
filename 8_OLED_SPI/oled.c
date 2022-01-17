@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <math.h>
 
 #include "system.h"
 #include "io.h"
@@ -256,6 +257,12 @@ void OLED_SetCursor(int row, int col)
   _col = col;
 }
 
+void OLED_GetCursor(int *pRow, int *pCol)
+{
+  *pRow = _row;
+  *pCol = _col;
+}
+
 void OLED_DrawBitmap(const uint8_t *pBitmap)
 {
   int i;
@@ -308,6 +315,38 @@ void OLED_PutChar(char c)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void OLED_PixelData(int x, int y, int c)
+{
+  uint8_t page, bitIdx, val;
+  
+  x &= 0x7F;
+  y &= 0x3F;
+  
+  page = y >> 3;
+  //page = y / 8;
+  
+  bitIdx = y & 7;
+  //bitIdx = y % 8;
+  
+  val = _DspRam[page * NSEG + x];
+  
+  switch (c) {
+  case OLED_SETPIXEL:
+    val |= (1 << bitIdx);
+    break;
+    
+  case OLED_CLRPIXEL:
+    val &= ~(1 << bitIdx);
+    break;
+    
+  case OLED_INVPIXEL:
+    val ^= (1 << bitIdx);
+    break;
+  }
+  
+  _DspRam[page * NSEG + x] = val;
+}
+
 void OLED_SetPixel(int x, int y, int c)
 {
   uint8_t page, bitIdx, val;
@@ -353,6 +392,82 @@ int OLED_GetPixel(int x, int y)
   
   return (val & (1 << bitIdx)) != 0;
 }
+
+#define abs(a)      (((a) > 0) ? (a) : -(a))
+
+void OLED_Line(int x0, int y0, int x1, int y1, int c)
+{
+     int steep, t ;
+     int deltax, deltay, error;
+     int x, y;
+     int ystep;
+
+     steep = abs(y1 - y0) > abs(x1 - x0);
+
+     if (steep)
+     { // swap x and y
+         t = x0; x0 = y0; y0 = t;
+         t = x1; x1 = y1; y1 = t;
+     }
+
+     if (x0 > x1)
+     {  // swap ends
+         t = x0; x0 = x1; x1 = t;
+         t = y0; y0 = y1; y1 = t;
+     }
+
+     deltax = x1 - x0;
+     deltay = abs(y1 - y0);
+     error = 0;
+     y = y0;
+
+     if (y0 < y1) 
+         ystep = 1;
+     else
+         ystep = -1;
+
+     for (x = x0; x < x1; x++)
+     {
+         if (steep)
+            OLED_SetPixel(y, x, c);
+         else
+            OLED_SetPixel(x, y, c);
+
+         error += deltay;
+         if ((error << 1) >= deltax)
+         {
+             y += ystep;
+             error -= deltax;
+         } // if
+     } // for
+} // line
+
+void OLED_Circle(int x, int y, int r, int c)
+{
+    float step, t;
+    int dx, dy;
+
+    step = PI / 2 / 64;
+
+    for (t = 0; t <= PI / 2; t += step) {
+        dx = (int)(r * cos(t) + 0.5);
+        dy = (int)(r * sin(t) + 0.5);
+
+        if (x + dx < 128) {
+            if (y + dy < 64)
+                OLED_SetPixel(x + dx, y + dy, c);
+            if (y - dy >= 0)
+                OLED_SetPixel(x + dx, y - dy, c);
+        }
+        if (x - dx >= 0) {
+            if (y + dy < 64)
+                OLED_SetPixel(x - dx, y + dy, c);
+            if (y - dy >= 0)
+                OLED_SetPixel(x - dx, y - dy, c);
+        }
+    }
+}
+
 
 /////////////////////////////////
 

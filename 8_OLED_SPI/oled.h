@@ -30,8 +30,14 @@ void OLED_Scroll(int nLines);
 
 void OLED_SetFont(int font);
 void OLED_SetCursor(int row, int col);
+void OLED_GetCursor(int *pRow, int *pCol);
 void OLED_PutChar(char c);
 
 void OLED_putch(char c);
+
+void OLED_Line(int x0, int y0, int x1, int y1, int c);
+void OLED_Circle(int x, int y, int r, int c);
+
+void OLED_PixelData(int x, int y, int c);
 
 #endif

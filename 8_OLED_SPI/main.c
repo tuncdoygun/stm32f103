@@ -109,7 +109,19 @@ void OLED_Test(void)
   c = OLED_GetPixel(0, 0);
   c = OLED_GetPixel(0, 1);
   
+  OLED_Line(37, 11, 93, 55, OLED_SETPIXEL);
+  OLED_Line(127, 0, 0, 63, OLED_SETPIXEL);
+  
+  OLED_Circle(61, 30, 15, OLED_SETPIXEL);
+  OLED_Circle(41, 17, 6, OLED_SETPIXEL);
+  
   DrawSin();
+  
+  OLED_PixelData(5, 40, OLED_SETPIXEL);
+  OLED_PixelData(6, 39, OLED_SETPIXEL);
+  OLED_PixelData(7, 38, OLED_SETPIXEL);
+  OLED_PixelData(8, 37, OLED_SETPIXEL);
+  OLED_UpdateDisplay();
 
   /*
   for (c = 0; c < NPGS * NSEG; ++c)
