@@ -1,0 +1,1 @@
+çalışmadı.software i2c'den kaynaklı olabilir.
