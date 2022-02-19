@@ -163,4 +163,20 @@ int main()
   //return 0;
 }
 
+/*
+void CRC_Init(void)
+{
+  // Enable CRC clock 
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);
+}
 
+// len: byte olarak uzunluk (4'ün tam katý)
+uint32_t CRC_Calc(const void *buffer, uint32_t len)
+{
+  
+  CRC_ResetDR();
+  
+  // Compute the CRC of "aDataBuffer" 
+  uwCRCValue = CRC_CalcBlockCRC((uint32_t *)buffer, len / 4);
+}
+*/

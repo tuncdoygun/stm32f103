@@ -272,7 +272,7 @@ int Task_Thermo(void)
     
   case S_CHECK:
     // Error check (CRC)
-    if (!CRC8(sp, 9)) 
+    if (!CRC8(sp, 9)) // Scratchpad'deki ilk 9 byte CRC'ye gonderilirse 0 doner.
       temp = (int)(*(int16_t *)sp);
       
     state = S_INIT;
