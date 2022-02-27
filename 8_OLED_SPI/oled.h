@@ -11,11 +11,11 @@ enum {
   OLED_INVPIXEL
 };
 
-enum {
-  FNT_SMALL,
-  FNT_LARGE
-};
-
+// Font sabitleri
+#define FNT_SMALL       0       // 5x8
+#define FNT_LARGE       1       // 7x16
+#define FNT_BIG         2       // 15x32
+  
 extern uint8_t  _DspRam[];
 
 void OLED_Data(uint8_t data);

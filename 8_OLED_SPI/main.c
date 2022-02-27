@@ -151,6 +151,9 @@ int main()
   // Baþlangýç yapýlandýrmalarý
   init();
 
+  OLED_SetFont(FNT_BIG);
+  printf("Hello!\n");  
+  
   /*
   OLED_SetFont(FNT_LARGE);
   printf("Hello, world!\n");
@@ -168,7 +171,7 @@ int main()
   while (1)
   {
     Task_LED(); //diðer tasklarýn doðru çalýþýp çalýþmadýðýný,aksama olup olmadýðýný anlamak için kullanýlabilir.Akýþ devam ediyorsa LED düzgün yanýp sönüyordur.
-    Task_Print();  
+    //Task_Print();  
 }
   //return 0;
 }

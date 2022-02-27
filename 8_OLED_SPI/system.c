@@ -59,7 +59,7 @@ void Sys_ClockInit(void)
 // KONSOL FONKSÝYONLARI
 void Sys_ConsoleInit(void)
 {
-  OLED_Start(1);
+  OLED_Start(0);
 
 #ifndef __IAR_SYSTEMS_ICC__
   setvbuf(stdout, NULL, _IONBF, 0);

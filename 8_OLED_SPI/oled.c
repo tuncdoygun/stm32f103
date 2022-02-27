@@ -8,8 +8,15 @@
 
 #include "oled.h"
 
+#ifdef FNT_SMALL
 #include "font_5x8.h"
+#endif
+#ifdef FNT_LARGE
 #include "font_7x16.h"
+#endif
+#ifdef FNT_BIG
+#include "font_15x32.h"
+#endif
 
 #define T_COLS  (NSEG / ((_szWidth) + 1)) // kac tane text sutun
 #define T_ROWS  (NPGS / (_szHeight)) // kav tane text satir
@@ -212,19 +219,30 @@ void OLED_UpdateDisplay(void)
 void OLED_SetFont(int font)
 {
   switch (font) {
+#ifdef FNT_SMALL    
   case FNT_SMALL:
     _szWidth = 5;
     _szHeight = 1;
     _pFont = g_ChrTab;
     _font = FNT_SMALL;
     break;
-    
+#endif    
+#ifdef FNT_LARGE
   case FNT_LARGE:
     _szWidth = 7;
     _szHeight = 2;
     _pFont = g_ChrTab2;
     _font = FNT_LARGE;
     break;
+#endif    
+#ifdef FNT_BIG
+  case FNT_BIG:
+    _szWidth = 15;
+    _szHeight = 4;
+    _pFont = g_ChrTab3;
+    _font = FNT_BIG;
+    break;
+#endif    
   }
 }
 
@@ -250,6 +268,8 @@ int OLED_GetFont(void)
 {
   return _font;
 }
+
+
 
 void OLED_SetCursor(int row, int col)
 {
@@ -295,6 +315,15 @@ void OLED_PutChar(char c)
     OLED_Return();
     OLED_NewLine();
   }
+  
+#ifdef FNT_BIG
+  if (_font == FNT_BIG) {
+    if (c < 32 || c > 127)
+      c = 32;
+    
+    c -= 32;
+  }
+#endif    
   
   for (k = 0; k < _szHeight; ++k) {
     OLED_SetPage(_row * _szHeight + k);
@@ -442,6 +471,7 @@ void OLED_Line(int x0, int y0, int x1, int y1, int c)
      } // for
 } // line
 
+/*
 void OLED_Circle(int x, int y, int r, int c)
 {
     float step, t;
@@ -467,56 +497,7 @@ void OLED_Circle(int x, int y, int r, int c)
         }
     }
 }
-
-#define abs(a)      (((a) > 0) ? (a) : -(a))
-
-void OLED_Line(int x0, int y0, int x1, int y1, int c)
-{
-     int steep, t ;
-     int deltax, deltay, error;
-     int x, y;
-     int ystep;
-
-     steep = abs(y1 - y0) > abs(x1 - x0);
-
-     if (steep)
-     { // swap x and y
-         t = x0; x0 = y0; y0 = t;
-         t = x1; x1 = y1; y1 = t;
-     }
-
-     if (x0 > x1)
-     {  // swap ends
-         t = x0; x0 = x1; x1 = t;
-         t = y0; y0 = y1; y1 = t;
-     }
-
-     deltax = x1 - x0;
-     deltay = abs(y1 - y0);
-     error = 0;
-     y = y0;
-
-     if (y0 < y1) 
-         ystep = 1;
-     else
-         ystep = -1;
-
-     for (x = x0; x < x1; x++)
-     {
-         if (steep)
-            OLED_SetPixel(y, x, c);
-         else
-            OLED_SetPixel(x, y, c);
-
-         error += deltay;
-         if ((error << 1) >= deltax)
-         {
-             y += ystep;
-             error -= deltax;
-         } // if
-     } // for
-} // line
-
+*/
 /////////////////////////////////
 
 void OLED_putch(char c) // printf ile kullanilabilmesi icin.
