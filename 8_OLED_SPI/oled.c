@@ -468,6 +468,54 @@ void OLED_Circle(int x, int y, int r, int c)
     }
 }
 
+#define abs(a)      (((a) > 0) ? (a) : -(a))
+
+void OLED_Line(int x0, int y0, int x1, int y1, int c)
+{
+     int steep, t ;
+     int deltax, deltay, error;
+     int x, y;
+     int ystep;
+
+     steep = abs(y1 - y0) > abs(x1 - x0);
+
+     if (steep)
+     { // swap x and y
+         t = x0; x0 = y0; y0 = t;
+         t = x1; x1 = y1; y1 = t;
+     }
+
+     if (x0 > x1)
+     {  // swap ends
+         t = x0; x0 = x1; x1 = t;
+         t = y0; y0 = y1; y1 = t;
+     }
+
+     deltax = x1 - x0;
+     deltay = abs(y1 - y0);
+     error = 0;
+     y = y0;
+
+     if (y0 < y1) 
+         ystep = 1;
+     else
+         ystep = -1;
+
+     for (x = x0; x < x1; x++)
+     {
+         if (steep)
+            OLED_SetPixel(y, x, c);
+         else
+            OLED_SetPixel(x, y, c);
+
+         error += deltay;
+         if ((error << 1) >= deltax)
+         {
+             y += ystep;
+             error -= deltax;
+         } // if
+     } // for
+} // line
 
 /////////////////////////////////
 
