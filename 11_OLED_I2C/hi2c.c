@@ -79,22 +79,24 @@ void HI2C_Stop(int nI2C)
 int HI2C_Start(int nI2C, unsigned char ctl)
 {
   I2C_TypeDef *pI2C = _i2c[nI2C];
-  int stat;
+  int stat, nTry;
   
-  I2C_GenerateSTART(pI2C, ENABLE);      // Start condition
-  
-  if (!HI2C_Event(nI2C, I2C_EVENT_MASTER_MODE_SELECT)) 
-    return FALSE;
-  
-  I2C_SendData(pI2C, ctl);     // !!
-  
-  stat = HI2C_Event(nI2C, ctl & 1 ? 
-    I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED :
-    I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED);
-  
-  if (stat != SUCCESS)
-    I2C_GenerateSTOP(pI2C, ENABLE);      // Stop condition
-  
+  nTry = 5;
+  do {
+    I2C_GenerateSTART(pI2C, ENABLE);      // Start condition
+    
+    if (HI2C_Event(nI2C, I2C_EVENT_MASTER_MODE_SELECT)) {    
+      I2C_SendData(pI2C, ctl);     // !!
+      
+      stat = HI2C_Event(nI2C, ctl & 1 ? 
+        I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED :
+        I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED);
+      
+      if (stat)
+        break;
+    }
+  } while (--nTry);
+    
   return stat;
 }
                       
