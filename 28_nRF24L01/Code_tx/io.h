@@ -46,6 +46,10 @@ enum {
   // nRF24
   IOP_nRF_CSN,
   IOP_nRF_CE,
+  
+  // UART1-console
+  IOP_U1RX,
+  IOP_U1TX,  
 };
 
 #ifdef _IOS_ // birkere tanýmlanmasý gereken
@@ -66,6 +70,10 @@ IO_PIN _ios[] = {
   // nRF24
   {IO_PORT_A, 3}, // CSN
   {IO_PORT_A, 2}, // CE  
+  
+  // UART-1
+  {IO_PORT_A, 10}, // RX
+  {IO_PORT_A, 9},  // TX
 };
 
 GPIO_TypeDef *_GPIO_Ports[] = {

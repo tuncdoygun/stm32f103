@@ -4,6 +4,7 @@
 #include "stm32f10x.h"
 #include "system.h"
 #include "oled.h"
+#include "uart.h"
 
 #define _STDIN  0
 #define _STDOUT 1
@@ -59,8 +60,9 @@ void Sys_ClockInit(void)
 // KONSOL FONKSÝYONLARI
 void Sys_ConsoleInit(void)
 {
-  OLED_Start(0);
-
+  //OLED_Start(0);
+  UART_Init(g_conUART, 9600);
+  
 #ifndef __IAR_SYSTEMS_ICC__
   setvbuf(stdout, NULL, _IONBF, 0);
 #endif
@@ -68,7 +70,8 @@ void Sys_ConsoleInit(void)
 
 void _putch(unsigned char c)
 {
-  OLED_putch(c);
+  //OLED_putch(c);
+  UART_putch(c);
 }
 
 #ifdef __IAR_SYSTEMS_ICC__

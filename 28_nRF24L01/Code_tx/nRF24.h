@@ -122,16 +122,10 @@ References:				This library was written based on the Arduino NRF24 Open-Source l
 #define RF_PWR_LOW  1
 #define RF_PWR_HIGH 2
 
-#include "stm32f4xx_hal.h"   //** Change this according to your STM32 series **//
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-//1. Pinout Ports and Pin
-//#define nrf_CSN_PORT		GPIOD
-//#define nrf_CSN_PIN			GPIO_PIN_0
-
-//#define nrf_CE_PORT			GPIOD
-//#define nrf_CE_PIN			GPIO_PIN_1
+#include <stdint.h>
 
 //**** TypeDefs ****//
 //1. Power Amplifier function, NRF24_setPALevel() 
@@ -141,19 +135,22 @@ typedef enum {
 	RF24_PA_m6dB,
 	RF24_PA_0dB,
 	RF24_PA_ERROR 
-}rf24_pa_dbm_e ;
+}rf24_pa_dbm_e;
+
 //2. NRF24_setDataRate() input
 typedef enum { 
 	RF24_1MBPS = 0,
 	RF24_2MBPS,
 	RF24_250KBPS
 }rf24_datarate_e;
+
 //3. NRF24_setCRCLength() input
 typedef enum { 
 	RF24_CRC_DISABLED = 0,
 	RF24_CRC_8,
 	RF24_CRC_16
 }rf24_crclength_e;
+
 //4. Pipe address registers
 static const uint8_t NRF24_ADDR_REGS[7] = {
 		REG_RX_ADDR_P0,
@@ -164,6 +161,7 @@ static const uint8_t NRF24_ADDR_REGS[7] = {
 		REG_RX_ADDR_P5,
 		REG_TX_ADDR
 };
+
 //5. RX_PW_Px registers addresses
 static const uint8_t RF24_RX_PW_PIPE[6] = {
 		REG_RX_PW_P0, 
@@ -173,6 +171,7 @@ static const uint8_t RF24_RX_PW_PIPE[6] = {
 		REG_RX_PW_P4,
 		REG_RX_PW_P5
 };
+
 //**** Functions prototypes ****//
 //Microsecond delay function
 void NRF24_DelayMicroSeconds(uint32_t uSec);
@@ -201,7 +200,7 @@ void NRF24_flush_rx(void);
 uint8_t NRF24_get_status(void);
 
 //12. Begin function
-void NRF24_begin(GPIO_TypeDef *nrf24PORT, uint16_t nrfCSN_Pin, uint16_t nrfCE_Pin, SPI_HandleTypeDef nrfSPI);
+void NRF24_begin(void);
 //13. Listen on open pipes for reading (Must call NRF24_openReadingPipe() first)
 void NRF24_startListening(void);
 //14. Stop listening (essential before any write operation)
@@ -285,6 +284,6 @@ void printStatusReg(void);
 //3. Print Config 
 void printConfigReg(void);
 //4. Init Variables
-void nrf24_DebugUART_Init(UART_HandleTypeDef nrf24Uart);
+void nrf24_DebugUART_Init();
 //5. FIFO Status
 void printFIFOstatus(void);

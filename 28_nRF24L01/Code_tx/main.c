@@ -5,6 +5,7 @@
 #include "system.h"
 #include "io.h"
 #include "oled.h"
+#include "uart.h"
 
 void init(void)
 {
@@ -74,8 +75,7 @@ int main()
 {
   // Baþlangýç yapýlandýrmalarý
   init();
-
-  OLED_SetFont(FNT_BIG);
+  
   printf("Hello!\n");  
   
   // Görev çevrimi (Task Loop)
