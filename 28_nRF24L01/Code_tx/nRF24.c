@@ -19,10 +19,14 @@ References:				This library was written based on the Arduino NRF24 Open-Source l
 
 //List of header files
 #include "NRF24.h"
+#include <stdio.h>
+#include <stdint.h>
 #include "system.h"
 #include "io.h"
 #include "spi.h"
 #include "uart.h"
+
+#define SPI_Read()  SPI_Data(0)
 
 //*** Variables declaration ***//
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
@@ -68,7 +72,9 @@ uint8_t NRF24_read_register(uint8_t reg)
   
   //Transmit register address
   spiBuf[0] = reg & 0x1F;
-  spiBuf[1] = SPI_Data(spiBuf[0]);
+  SPI_Data(spiBuf[0]);
+  
+  spiBuf[1] = SPI_Read();
   retData = spiBuf[1];
   
   //Bring CSN high
@@ -88,9 +94,9 @@ void NRF24_read_registerN(uint8_t reg, uint8_t *buf, uint8_t len)
  //Transmit register address
  spiBuf[0] = reg & 0x1F;
  
- buf[0] = SPI_Data(spiBuf[0]);
- for(int i = 1; i < len; ++i)
-   buf[i] = SPI_Data(0xFF);
+ SPI_Data(spiBuf[0]);
+ for(int i = 0; i < len; ++i)
+   buf[i] = SPI_Read();
  
  //Bring CSN high
  NRF24_csn(1);
@@ -164,9 +170,9 @@ void NRF24_read_payload(void* buf, uint8_t len)
   NRF24_csn(0);
   
   cmdRxBuf = CMD_R_RX_PAYLOAD;
-  buffer[0] = SPI_Data(cmdRxBuf);
-  for(int i = 1; i < data_len; ++i)
-    buffer[i] = SPI_Data(0xFF);
+  SPI_Data(cmdRxBuf);
+  for(int i = 0; i < data_len; ++i)
+    buffer[i] = SPI_Read();
   
   //Bring CSN high
   NRF24_csn(1);
@@ -200,6 +206,9 @@ void NRF24_begin()
   //Put pins to idle state
   NRF24_csn(1);
   NRF24_ce(0);
+  
+  IO_Init(IOP_nRF_CSN, IO_MODE_OUTPUT);
+  IO_Init(IOP_nRF_CE, IO_MODE_OUTPUT);
   
   //5 ms initial delay
   DelayMs(5);
@@ -253,14 +262,14 @@ void NRF24_begin()
   NRF24_ACTIVATE_cmd();
   NRF24_write_register(0x1c, 0);
   NRF24_write_register(0x1d, 0);
-  printRadioSettings();
+  //printRadioSettings();
   
   //Initialise retries 15 and delay 1250 usec
   NRF24_setRetries(15, 15);
   //Initialise PA level to max (0dB)
   NRF24_setPALevel(RF24_PA_0dB);
   //Initialise data rate to 1Mbps
-  NRF24_setDataRate(RF24_2MBPS);
+  NRF24_setDataRate(RF24_1MBPS);
   //Initalise CRC length to 16-bit (2 bytes)
   NRF24_setCRCLength(RF24_CRC_16);
   //Disable dynamic payload
@@ -876,7 +885,7 @@ void printRadioSettings(void)
     printf("RF_PWR:\r\n		0dB \r\n");
   
   //g) RX pipes addresses
-  uint8_t pipeAddrs[6];
+  uint8_t pipeAddrs[5];
   NRF24_read_registerN(0x0A, pipeAddrs, 5);
   printf("RX_Pipe0 Addrs:\r\n		%02X,%02X,%02X,%02X,%02X  \r\n", pipeAddrs[4], pipeAddrs[3], pipeAddrs[2],pipeAddrs[1],pipeAddrs[0]);
   

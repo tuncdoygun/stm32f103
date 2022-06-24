@@ -4,8 +4,9 @@
 
 #include "system.h"
 #include "io.h"
-#include "oled.h"
 #include "uart.h"
+#include "spi.h"
+#include "nRF24.h"
 
 void init(void)
 {
@@ -21,6 +22,10 @@ void init(void)
   
   // Console baþlangýç
   Sys_ConsoleInit();  
+  
+  SPI_Start();
+    
+  NRF24_begin();
 }
 
 // 29.07.2021
@@ -73,17 +78,40 @@ void Task_Print(void)
 
 int main()
 {
+  uint64_t TxpipeAddrs = 0x11225544AA;
+  char myTxData[32] = "Hello World!";
+  char AckPayload[32];
+  
   // Baþlangýç yapýlandýrmalarý
   init();
+
+  //**** TRANSMIT - ACK ****//
+  NRF24_stopListening();
+  NRF24_openWritingPipe(TxpipeAddrs);
+  NRF24_setAutoAck(true);
+  NRF24_setChannel(52);
+  NRF24_setPayloadSize(32);
+
+  NRF24_enableDynamicPayloads();
+  NRF24_enableAckPayload();
   
-  printf("Hello!\n");  
+  printRadioSettings();
   
   // Görev çevrimi (Task Loop)
   // Co-Operative Multitasking (Yardýmlaþmalý çoklu görev)
   while (1)
   {
     Task_LED();  
-}
+    
+    if(NRF24_write(myTxData, 32))
+    {
+      NRF24_read(AckPayload, 32);
+      printf("Transmitted Successfully\r\n");	
+      printf("AckPayload:  %s \r\n", AckPayload);
+    }
+		
+    DelayMs(1000);
+  }
 }
 
 
