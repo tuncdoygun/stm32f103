@@ -5,16 +5,12 @@
 #include "system.h"
 #include "io.h"
 
-// SOFTWARE SPI
-
-///////////////////////////////////////////////////
-
 #define SPI_PORT        SPI1
 
 // HARDWARE SPI
 
 // Donanýmsal SPI çev. birimini baþlatýr.
-void HSPI_Start(void) // baþtaki H hardware
+void SPI_Start(void) // baþtaki H hardware
 {
   SPI_InitTypeDef spiInit;
   
@@ -27,7 +23,7 @@ void HSPI_Start(void) // baþtaki H hardware
   IO_Init(IOP_SPI_MISO, IO_MODE_INPUT);
   
   // 3 - SPI Init structure parametreleri yapýlandýrýlýr.
-  spiInit.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4; // 18 MHz .spi çalýþtýrýrken,spi þu hýzda çalýþsýn demek yerine apb kaça bölünsün de hýzý belirlensin olarak hesaplanýr.
+  spiInit.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64; // 18 MHz .spi çalýþtýrýrken,spi þu hýzda çalýþsýn demek yerine apb kaça bölünsün de hýzý belirlensin olarak hesaplanýr.
   spiInit.SPI_CPOL = SPI_CPOL_Low; // Mode - 0
   spiInit.SPI_CPHA = SPI_CPHA_1Edge;
   spiInit.SPI_DataSize = SPI_DataSize_8b;
@@ -44,7 +40,7 @@ void HSPI_Start(void) // baþtaki H hardware
 
 // SPI üzerinden 8 bit veri gönderir ve alýr.
 // sadece veri almak için dummy bir deðer gönderilebilir.
-uint8_t HSPI_Data(uint8_t val)
+uint8_t SPI_Data(uint8_t val)
 {
   // SPI Transmit buffer boþ mu ?
   while(!SPI_I2S_GetFlagStatus(SPI_PORT, SPI_I2S_FLAG_TXE));
@@ -54,6 +50,6 @@ uint8_t HSPI_Data(uint8_t val)
   while(!SPI_I2S_GetFlagStatus(SPI_PORT, SPI_I2S_FLAG_RXNE)); // normalde almadan çýkmaz gibi dursa da,tx ile rx ayný anda çalýþýyor.
   
   val = SPI_I2S_ReceiveData(SPI_PORT);
-  
+
   return val;
 }

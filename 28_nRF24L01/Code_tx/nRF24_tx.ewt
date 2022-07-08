@@ -2378,6 +2378,9 @@
     <name>$PROJ_DIR$\nRF24.h</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\nRF24L01.h</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\oled.c</name>
   </file>
   <file>

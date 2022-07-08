@@ -25,7 +25,11 @@ void init(void)
   
   SPI_Start();
     
-  NRF24_begin();
+  // init hardware pins
+  nrf24_init();
+    
+  // Channel #2 , payload length: 4
+  nrf24_config(2, 4);
 }
 
 // 29.07.2021
@@ -78,32 +82,31 @@ void Task_Print(void)
 
 int main()
 {
-  uint64_t RxpipeAddrs = 0x11223344AA;
-  char myRxData[50];
-  char myAckPayload[32] = "Ack by STMF1!";  
+  uint8_t temp;
+  uint8_t q = 0;
+  uint8_t data_array[4];
+  uint8_t tx_address[5] = {0xE7,0xE7,0xE7,0xE7,0xE7};
+  uint8_t rx_address[5] = {0xD7,0xD7,0xD7,0xD7,0xD7}; 
   
   init();
    
-  NRF24_setAutoAck(true);
-  NRF24_setChannel(52);
-  NRF24_setPayloadSize(32);
-  NRF24_openReadingPipe(1, RxpipeAddrs);
-  NRF24_enableDynamicPayloads();
-  NRF24_enableAckPayload();
-	
-  NRF24_startListening(); 
-  
-  printRadioSettings();
+  nrf24_tx_address(rx_address);
+  nrf24_rx_address(tx_address);
+  //printRadioSettings();
+  //printConfigReg();
+  //printStatusReg();
   
   while (1)
   {
     Task_LED();  
     
-    if(NRF24_available())
-    {
-      NRF24_read(myRxData, 32);
-      NRF24_writeAckPayload(1, myAckPayload, 32);
-      printf("%s \r\n", myRxData);
+    if(nrf24_dataReady()){
+      nrf24_getData(data_array);
+      printf("> ");
+      printf("%2X ",data_array[0]);
+      printf("%2X ",data_array[1]);
+      printf("%2X ",data_array[2]);
+      printf("%2X\r\n",data_array[3]);
     }
   }
 }

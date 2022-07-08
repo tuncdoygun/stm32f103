@@ -1,0 +1,3 @@
+12.06 - nrf.c ve nrf.h dosyaları uyarlandı.tx ve rx için uygulama kodu yaz.
+23.06 - nrf çipinden verileri başarıyla aldım.fakat NRF24_write true olarak dönmüyor.NRF24_whatHappened fonksiyonunda tok false dönüyor.true dönmesi için TX_DS 1 olmalı.O da ACK alındığında 1 oluyormuş.RX kısmının devresini kurup kodu atıp o şekilde dene.
+24.06 - rx için kod eklendi,nrf'e atıldı,çalışıyor.Fakat tx kısmı hala true olmuyor.

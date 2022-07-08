@@ -7,6 +7,7 @@
 #include "uart.h"
 #include "spi.h"
 #include "nRF24.h"
+#include "oled.h"
 
 void init(void)
 {
@@ -25,7 +26,11 @@ void init(void)
   
   SPI_Start();
     
-  NRF24_begin();
+  // init hardware pins
+  nrf24_init();
+    
+  // Channel #2 , payload length: 4
+  nrf24_config(2, 4);
 }
 
 // 29.07.2021
@@ -78,39 +83,64 @@ void Task_Print(void)
 
 int main()
 {
-  uint64_t TxpipeAddrs = 0x11225544AA;
-  char myTxData[32] = "Hello World!";
-  char AckPayload[32];
+  uint8_t temp;
+  uint8_t q = 0;
+  uint8_t data_array[4];
+  uint8_t tx_address[5] = {0xE7,0xE7,0xE7,0xE7,0xE7};
+  uint8_t rx_address[5] = {0xD7,0xD7,0xD7,0xD7,0xD7};
   
   // Baþlangýç yapýlandýrmalarý
   init();
 
-  //**** TRANSMIT - ACK ****//
-  NRF24_stopListening();
-  NRF24_openWritingPipe(TxpipeAddrs);
-  NRF24_setAutoAck(true);
-  NRF24_setChannel(52);
-  NRF24_setPayloadSize(32);
+  OLED_SetFont(FNT_SMALL);
+  printf("Merhaba nRF!\n");
+  
+  // Set the device addresses 
+  nrf24_tx_address(tx_address);
+  nrf24_rx_address(rx_address);  
 
-  NRF24_enableDynamicPayloads();
-  NRF24_enableAckPayload();
-  
-  printRadioSettings();
-  
+  //printConfigReg();
+  //printStatusReg();
+    
   // Görev çevrimi (Task Loop)
   // Co-Operative Multitasking (Yardýmlaþmalý çoklu görev)
   while (1)
   {
     Task_LED();  
     
-    if(NRF24_write(myTxData, 32))
-    {
-      NRF24_read(AckPayload, 32);
-      printf("Transmitted Successfully\r\n");	
-      printf("AckPayload:  %s \r\n", AckPayload);
-    }
-		
-    DelayMs(1000);
+    /* Fill the data buffer */
+    data_array[0] = 0x00;
+    data_array[1] = 0xAA;
+    data_array[2] = 0x55;
+    data_array[3] = q++;                                    
+
+    /* Automatically goes to TX mode */
+    nrf24_send(data_array);        
+      
+    /* Wait for transmission to end */
+    while(nrf24_isSending());
+
+    /* Make analysis on last tranmission attempt */
+    temp = nrf24_lastMessageStatus();
+
+    if(temp == NRF24_TRANSMISSON_OK)                  
+        printf("Tranmission  OK\r\n");
+    else if(temp == NRF24_MESSAGE_LOST)                  
+        printf("Message is lost\r\n");    
+        
+    /* Retranmission count indicates the tranmission quality */
+    temp = nrf24_retransmissionCount();
+    printf("Retranmission count: %d\r\n", temp);
+
+    /* Optionally, go back to RX mode ... */
+    // nrf24_powerUpRx();
+    //printConfigReg();
+    //printStatusReg();
+    /* Or you might want to power down after TX */
+    nrf24_powerDown();            
+    
+    /* Wait a little ... */
+    DelayMs(100);
   }
 }
 

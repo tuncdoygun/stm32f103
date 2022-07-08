@@ -3,6 +3,9 @@
 
 #include "stm32f10x_gpio.h"
 
+#define IO_OLED_RES // kullanýlacak çipte cs veya res olup olmama durumu
+#define IO_OLED_CS
+
 enum {
   IO_PORT_A,
   IO_PORT_B,

@@ -5,16 +5,12 @@
 #include "system.h"
 #include "io.h"
 
-// SOFTWARE SPI
-
-///////////////////////////////////////////////////
-
 #define SPI_PORT        SPI1
 
 // HARDWARE SPI
 
 // Donanýmsal SPI çev. birimini baþlatýr.
-void HSPI_Start(void) // baþtaki H hardware
+void SPI_Start(void) // baþtaki H hardware
 {
   SPI_InitTypeDef spiInit;
   
@@ -44,7 +40,7 @@ void HSPI_Start(void) // baþtaki H hardware
 
 // SPI üzerinden 8 bit veri gönderir ve alýr.
 // sadece veri almak için dummy bir deðer gönderilebilir.
-uint8_t HSPI_Data(uint8_t val)
+uint8_t SPI_Data(uint8_t val)
 {
   // SPI Transmit buffer boþ mu ?
   while(!SPI_I2S_GetFlagStatus(SPI_PORT, SPI_I2S_FLAG_TXE));
