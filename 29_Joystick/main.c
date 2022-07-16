@@ -36,7 +36,7 @@ void init(void)
   
   // nRF24 baslangic
   nrf24_init();  
-  nrf24_config(2, 4);  // Channel #2 , payload length: 4
+  nrf24_config(2, 3);  // Channel #2 , payload length: 3
 }
 
 void Task_LED(void)
