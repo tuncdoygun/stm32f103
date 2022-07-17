@@ -1,0 +1,4 @@
+nRF'den gelen 2 byte veriden 12 bit Joystick ADC verisi alınıp servo motora gönderilecek.
+
+16.07 - proje oluşturuldu.
+17.07 - vericiden joystick analog değerleri 2 byte halinde ayrı ayrı geliyor.Alıcıda bu verileri birleştiriyor ve pwm duty olarak görülebiliyor.PWM channel sayısı şuanlık 1 taneye göre programlanmış.2 ayrı PWM çıkışı verilebilmesi için timer.c driverını ayarla
