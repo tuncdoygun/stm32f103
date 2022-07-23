@@ -2,3 +2,6 @@ nRF'den gelen 2 byte veriden 12 bit Joystick ADC verisi alınıp servo motora g�
 
 16.07 - proje oluşturuldu.
 17.07 - vericiden joystick analog değerleri 2 byte halinde ayrı ayrı geliyor.Alıcıda bu verileri birleştiriyor ve pwm duty olarak görülebiliyor.PWM channel sayısı şuanlık 1 taneye göre programlanmış.2 ayrı PWM çıkışı verilebilmesi için timer.c driverını ayarla
+19.07 - servo devresi oluşturuldu.PWM duty cycle aralığı belirlendi.RF ile yönetmeye çalış.
+20.07 - gelen adc verisini servonun kullanabileceği aralıkta maplamak gerekiyor. örneğin 0-4095'i 0-300'e
+23.07 - nrf ile servo yonetimi tamamlandı.Fırçasız motor kontrol et.

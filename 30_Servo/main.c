@@ -9,6 +9,9 @@
 #include "nRF24.h"
 #include "timer.h"
 
+#define DEFAULT_PWM     2150
+int g_PWMPeriod;
+
 void init(void)
 {
   // System Clock init
@@ -29,6 +32,9 @@ void init(void)
     
   // Channel #2 , payload length: 3
   nrf24_config(2, 3);
+  
+  // 50Hz %7 pwm start
+  g_PWMPeriod = PWM_Init(50, 7);
 }
 
 // 29.07.2021
@@ -79,7 +85,9 @@ void Task_Print(void)
   printf("SAYI:%10u\r", ++count);
 }
 
-int g_PWMPeriod;
+int map(int x, int in_min, int in_max, int out_min, int out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 
 void Task_Servo(void){
   uint8_t data_array[3];
@@ -96,7 +104,21 @@ void Task_Servo(void){
       datax = (data_array[1] << 8) | data_array[2];
       
       // Duty cycle joystickten gelen veri ile degisiyor
-      duty_x = datax * g_PWMPeriod / 4095; 
+      //duty_x = datax * g_PWMPeriod / 4095; 
+      
+      /*
+      Normalde duty yukardaki gibi hesaplaniyor.Fakat servo motorun calismasi icin gereken duty'i
+      joystick'in tamamina yayabilmek icin maplamak gerekiyor.
+      Gelen 12 bitlik adc datasini(normalde 0-4095 fakat 60-3800 aldik) bir altindaki formule gore(bu pwm yazilimina gore servo
+      duty araligi 550-3800) mapladik.
+   
+      550 0 derece (0,11V) 
+      2150 90 derece (0,35V)
+      3800 180 derece (0,6V)
+      */
+      datax = map(datax, 60, 3800, 68, 470); 
+      duty_x = datax * g_PWMPeriod / 4095;
+      
       PWM_Duty(duty_x);  
       
       printf("datax = %d duty_x = %d\r\n", datax, duty_x);
@@ -109,7 +131,7 @@ void Task_Servo(void){
       PWM_Duty(duty); 
       */
       
-      printf("datay = %d\r\n", datay);
+      //printf("datay = %d\r\n", datay);
     } else 
       printf("Bilinmeyen veri tipi!\r\n");
   }
@@ -125,7 +147,8 @@ int main()
   nrf24_tx_address(rx_address);
   nrf24_rx_address(tx_address);
   
-  g_PWMPeriod = PWM_Init(10000, 50); 
+  PWM_Duty(DEFAULT_PWM);
+  
   //printRadioSettings();
   //printConfigReg();
   //printStatusReg();
