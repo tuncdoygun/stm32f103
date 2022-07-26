@@ -43,11 +43,6 @@ enum {
   IOP_SPI2_MISO,
   IOP_SPI2_MOSI,
   
-  // OLED
-  IOP_OLED_RES,
-  IOP_OLED_DC,  
-  IOP_OLED_CS,
-
   // nRF24
   IOP_nRF_CSN,
   IOP_nRF_CE,
@@ -56,8 +51,11 @@ enum {
   IOP_U1RX,
   IOP_U1TX,
   
-  // TIM2_CH2 pwm cikisi
+  // TIM2_CH3 pwm cikisi
   IOP_PWM_ESC,
+  
+  // TIM2_CH2 pwm cikisi
+  IOP_PWM_SERVO,  
 };
 
 #ifdef _IOS_ // birkere tanýmlanmasý gereken
@@ -74,22 +72,20 @@ IO_PIN _ios[] = {
   { IO_PORT_B, 13 },    // SCK
   { IO_PORT_B, 14 },    // MISO
   { IO_PORT_B, 15 },    // MOSI  
-  
-  // OLED 
-  {IO_PORT_B, 0}, // RES
-  {IO_PORT_B, 1}, // DC
-  {IO_PORT_A, 4}, // CS
 
   // nRF24
-  {IO_PORT_A, 3}, // CSN
-  {IO_PORT_A, 2}, // CE  
+  {IO_PORT_A, 4}, // CSN
+  {IO_PORT_A, 3}, // CE  
   
   // UART-1
   {IO_PORT_A, 10}, // RX
   {IO_PORT_A, 9},  // TX
   
+  // TIM2_CH3 PWM cikisi
+  {IO_PORT_A, 2}, // ESC
+
   // TIM2_CH2 PWM cikisi
-  {IO_PORT_A, 1}, // ESC
+  {IO_PORT_A, 1}, // servo  
 };
 
 GPIO_TypeDef *_GPIO_Ports[] = {

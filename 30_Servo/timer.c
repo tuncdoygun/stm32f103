@@ -78,17 +78,32 @@ void Timer_IntConfig(int tmNo, int priority)
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-// TIM2 CH2 kullanýlacak
+// TIM2 için PWM init fonksiyonu.4 channel kullanilabilir ve ayni frekans kullanilmak
+// zorunludur.Farklý bir frekans PWM gerekiyorsa farkli timer kullanilmali.
 // freq: PWM frekansý
 // duty: PWM duty cycle % olarak
-int PWM_Init(int freq, int duty)
+// ch: timer2 channel
+int PWM_Init(int freq, int duty, int ch)
 {
   //SystemCoreClock
   uint32_t period, prescale;
   
   // 1) Çýkýþ kanalýnýn I/O ayarlarý
-  IO_Init(IOP_PWM_ESC, IO_MODE_ALTERNATE);
-  
+  switch(ch) {
+  case TIM2_CH_1:
+    // io init    
+    break;
+  case TIM2_CH_2:
+    IO_Init(IOP_PWM_SERVO, IO_MODE_ALTERNATE);
+    break;
+  case TIM2_CH_3:
+    IO_Init(IOP_PWM_ESC, IO_MODE_ALTERNATE);
+    break;
+  case TIM2_CH_4:
+    //io init
+    break;      
+  };
+    
   // 2) Timer ayarlarý
   // PWM frekansý belirlenecek
   // ftmr = fsysclk / CKD_DIVx
@@ -115,7 +130,21 @@ int PWM_Init(int freq, int duty)
   ocInit.TIM_OutputState = TIM_OutputState_Enable;
   ocInit.TIM_Pulse = period * duty / 100;
   
-  TIM_OC2Init(TIM2, &ocInit);
+  switch(ch) {
+  case TIM2_CH_1:
+    TIM_OC1Init(TIM2, &ocInit);  
+    break;
+  case TIM2_CH_2:
+    TIM_OC2Init(TIM2, &ocInit);
+    break;
+  case TIM2_CH_3:
+    TIM_OC3Init(TIM2, &ocInit);
+    break;
+  case TIM2_CH_4:
+    TIM_OC4Init(TIM2, &ocInit);
+    break;      
+  };  
+  
   
   // 4) Timer'ý çalýþtýrýyoruz
   Timer_Start(TIMER_2, 1);
@@ -123,9 +152,22 @@ int PWM_Init(int freq, int duty)
   return period;
 }
 
-void PWM_Duty(int duty)
+void PWM_Duty(int duty, int ch)
 {
-  TIM_SetCompare2(TIM2, duty);
+  switch(ch) {
+  case TIM2_CH_1:
+    TIM_SetCompare1(TIM2, duty);
+    break;
+  case TIM2_CH_2:
+    TIM_SetCompare2(TIM2, duty);
+    break;
+  case TIM2_CH_3:
+    TIM_SetCompare3(TIM2, duty);
+    break;
+  case TIM2_CH_4:
+    TIM_SetCompare4(TIM2, duty);
+    break;      
+  };
 }
 
 ////////////////////////////////////////////////////////////////////////////////

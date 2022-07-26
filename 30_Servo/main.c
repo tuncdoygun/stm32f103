@@ -9,7 +9,10 @@
 #include "nRF24.h"
 #include "timer.h"
 
-#define DEFAULT_PWM     2150
+#define SERVO_0     550
+#define SERVO_90    2150
+#define SERVO_180   3800
+
 int g_PWMPeriod;
 
 void init(void)
@@ -34,7 +37,9 @@ void init(void)
   nrf24_config(2, 3);
   
   // 50Hz %7 pwm start
-  g_PWMPeriod = PWM_Init(50, 7);
+  g_PWMPeriod = PWM_Init(50, 7, TIM2_CH_3); // ESC
+  g_PWMPeriod = PWM_Init(50, 7, TIM2_CH_2); // SERVO
+  
 }
 
 // 29.07.2021
@@ -119,7 +124,7 @@ void Task_Servo(void){
       datax = map(datax, 60, 3800, 68, 470); 
       duty_x = datax * g_PWMPeriod / 4095;
       
-      PWM_Duty(duty_x);  
+      PWM_Duty(duty_x, TIM2_CH_2);  
       
       printf("datax = %d duty_x = %d\r\n", datax, duty_x);
     } else if(data_array[0] == 'Y') {
@@ -147,8 +152,9 @@ int main()
   nrf24_tx_address(rx_address);
   nrf24_rx_address(tx_address);
   
-  PWM_Duty(DEFAULT_PWM);
-  
+  //PWM_Duty(3500, TIM2_CH_3);
+  //PWM_Duty(SERVO_90, TIM2_CH_2);
+ 
   //printRadioSettings();
   //printConfigReg();
   //printStatusReg();
@@ -156,7 +162,7 @@ int main()
   while (1)
   {
     Task_LED();  
-    Task_Servo();
+    //Task_Servo();
 
   }
 }
