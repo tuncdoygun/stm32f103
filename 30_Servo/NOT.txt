@@ -7,3 +7,4 @@ nRF'den gelen 2 byte veriden 12 bit Joystick ADC verisi alınıp servo motora g�
 23.07 - nrf ile servo yonetimi tamamlandı.Fırçasız motor kontrol et.
 24.07 - fırçasız motor,esc,li-ion pil için gerekli kablo,şarj aleti vs belirlendi sipariş edildi.2 kanal PWM üretimi
 26.07 - aynı timer üzerinden çift kanal pwm üretildi.Motor bağlantılarını yapıp dene.
+04-08 - esc pwm eklendi.ayarlamalar yapıldı.yazılım bitti gibi.

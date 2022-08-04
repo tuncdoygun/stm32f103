@@ -121,7 +121,7 @@ void Task_Servo(void){
       2150 90 derece (0,35V)
       3800 180 derece (0,6V)
       */
-      datax = map(datax, 60, 3800, 68, 470); 
+      datax = map(datax, 60, 4000, 68, 470); 
       duty_x = datax * g_PWMPeriod / 4095;
       
       PWM_Duty(duty_x, TIM2_CH_2);  
@@ -130,13 +130,12 @@ void Task_Servo(void){
     } else if(data_array[0] == 'Y') {
       datay = (data_array[1] << 8) | data_array[2];
       
-      /*
-      // Duty cycle joystickten gelen veri ile degisiyor
-      duty = datay * g_PWMPeriod / 4095; 
-      PWM_Duty(duty); 
-      */
+      datay = map(datay, 60, 4000, 280, 300); 
+      duty_y = datay * g_PWMPeriod / 4095;
       
-      //printf("datay = %d\r\n", datay);
+      PWM_Duty(duty_y, TIM2_CH_3); 
+      
+      printf("datay = %d duty_y = %d\r\n", datay, duty_y);
     } else 
       printf("Bilinmeyen veri tipi!\r\n");
   }
@@ -152,9 +151,15 @@ int main()
   nrf24_tx_address(rx_address);
   nrf24_rx_address(tx_address);
   
-  //PWM_Duty(3500, TIM2_CH_3);
-  //PWM_Duty(SERVO_90, TIM2_CH_2);
- 
+  PWM_Duty(3500, TIM2_CH_3);
+  PWM_Duty(SERVO_0, TIM2_CH_2);
+  /*
+  PWM_Duty(4000, TIM2_CH_3);
+  PWM_Duty(SERVO_90, TIM2_CH_2);
+  
+  PWM_Duty(4500, TIM2_CH_3);
+  PWM_Duty(SERVO_180, TIM2_CH_2);
+  */
   //printRadioSettings();
   //printConfigReg();
   //printStatusReg();
@@ -162,7 +167,7 @@ int main()
   while (1)
   {
     Task_LED();  
-    //Task_Servo();
+    Task_Servo();
 
   }
 }
