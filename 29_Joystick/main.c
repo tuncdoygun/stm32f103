@@ -9,10 +9,10 @@
 #include "nRF24.h"
 
 #define SYS_CLOCK_FREQ  72000000
-#define JOY_CH_X        0
-#define JOY_CH_Y        1
+#define JOY_CH_Y        0
+#define JOY_CH_X        1
 
-#define NSAMPLES        1000
+#define NSAMPLES        200
 
 void init(void)
 {
@@ -37,6 +37,7 @@ void init(void)
   // nRF24 baslangic
   nrf24_init();  
   nrf24_config(2, 3);  // Channel #2 , payload length: 3
+  DelayMs(10);
 }
 
 void Task_LED(void)
@@ -103,39 +104,42 @@ void Task_Joystick(void)
     data_y[2] = resulty & 0xFF;        // resulty_low 
     
     OLED_SetCursor(0, 0);
-    printf("x1=%x x2=%x\n", data_x[1], data_x[2]);
-    printf("y1=%x y2=%x\n", data_y[1], data_y[2]);
-    printf("x=%d y=%d\n", resultx, resulty);
-    
+    printf("x1=%x x2=%x\n\r", data_x[1], data_x[2]);
+    printf("y1=%x y2=%x\n\r", data_y[1], data_y[2]);
+    printf("x=%4d\n\r", resultx);
+    printf("y=%4d\n\r", resulty);
+
     /////////////////////////////////////////////////
     nrf24_send(data_x);
     while(nrf24_isSending());
     /* Make analysis on last tranmission attempt */
     temp = nrf24_lastMessageStatus();
 
-    OLED_SetCursor(3, 0);
+    OLED_SetCursor(4, 0);
     if(temp == NRF24_TRANSMISSON_OK)                  
-        printf("X is OK\n");
+        printf("X is OK  \n\r");
     else if(temp == NRF24_MESSAGE_LOST)                  
-        printf("X is lost\n");  
+        printf("X is lost\n\r");  
     
-    nrf24_powerDown();
+    //nrf24_powerDown();
     //////////////////////////////////////////////////
-    
+
     //////////////////////////////////////////////////
     nrf24_send(data_y);
     while(nrf24_isSending());
     /* Make analysis on last tranmission attempt */
     temp = nrf24_lastMessageStatus();
 
-    OLED_SetCursor(4, 0);
+    OLED_SetCursor(5, 0);
     if(temp == NRF24_TRANSMISSON_OK)                  
-        printf("Y is OK\n");
+        printf("Y is OK  \n\r");
     else if(temp == NRF24_MESSAGE_LOST)                  
-        printf("Y is lost\n");      
+        printf("Y is lost\n\r");      
     
     nrf24_powerDown();
     //////////////////////////////////////////////////
+    
+    DelayUs(10);
     
     totalx = 0;
     totaly = 0;
