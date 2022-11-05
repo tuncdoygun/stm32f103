@@ -7,4 +7,6 @@ nRF'den gelen 2 byte veriden 12 bit Joystick ADC verisi alınıp servo motora g�
 23.07 - nrf ile servo yonetimi tamamlandı.Fırçasız motor kontrol et.
 24.07 - fırçasız motor,esc,li-ion pil için gerekli kablo,şarj aleti vs belirlendi sipariş edildi.2 kanal PWM üretimi
 26.07 - aynı timer üzerinden çift kanal pwm üretildi.Motor bağlantılarını yapıp dene.
-04-08 - esc pwm eklendi.ayarlamalar yapıldı.yazılım bitti gibi.
+04.08 - esc pwm eklendi.ayarlamalar yapıldı.yazılım bitti gibi.montaj yap.
+24.09 - 3.3v'dan gerilim verince veri alıyor.Fakat 5V'dan verince almıyor.
+29.09 - cihaz arabadan sökülüp usb kablosu ile bilgisayara ve adaptöre takıldı.Bilgisayarda çalıştı,adaptörlerin birinde çalıştı birinde çalışmadı.Verici için de pcb yap.Kutu basıp yerleştir.İkisini de pcb'de test et.Kutu bas.
