@@ -35,7 +35,11 @@ typedef struct {
 
 enum {
   IOP_LED,      // Blue pill LED
-  
+  IOP_LED_GREEN_1,
+  IOP_LED_GREEN_2,
+  IOP_LED_YELLOW,
+  IOP_LED_RED,
+          
   // I2C
   IOP_I2C1_SCL,
   IOP_I2C1_SDA,
@@ -83,6 +87,10 @@ enum {
 #ifdef _IOS_
 IO_PIN _ios[] = {
   { IO_PORT_C, 13 },    // LED
+  { IO_PORT_B, 12 },    // LED GREEN - 1
+  { IO_PORT_A, 8 },     // LED GREEN - 2
+  { IO_PORT_A, 9 },     // LED YELLOW 
+  { IO_PORT_A, 10 },    // LED RED
   
   // I2C
   { IO_PORT_B, 6 },    // SCL1

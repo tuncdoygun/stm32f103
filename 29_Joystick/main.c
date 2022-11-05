@@ -4,7 +4,6 @@
 
 #include "system.h"
 #include "io.h"
-#include "oled.h"
 #include "adc.h"
 #include "nRF24.h"
 
@@ -13,6 +12,14 @@
 #define JOY_CH_X        1
 
 #define NSAMPLES        200
+
+enum {
+  NONE,
+  GREEN_1,
+  GREEN_2,
+  YELLOW,
+  RED
+};
 
 void init(void)
 {
@@ -25,6 +32,14 @@ void init(void)
   // LED baþlangýç
   IO_Write(IOP_LED, 1);
   IO_Init(IOP_LED, IO_MODE_OUTPUT);
+  IO_Write(IOP_LED_GREEN_1, 0);
+  IO_Init(IOP_LED_GREEN_1, IO_MODE_OUTPUT);
+  IO_Write(IOP_LED_GREEN_2, 0);
+  IO_Init(IOP_LED_GREEN_2, IO_MODE_OUTPUT);
+  IO_Write(IOP_LED_YELLOW, 0);
+  IO_Init(IOP_LED_YELLOW, IO_MODE_OUTPUT);
+  IO_Write(IOP_LED_RED, 0);
+  IO_Init(IOP_LED_RED, IO_MODE_OUTPUT);
   
   // Console(oled) baþlangýç
   Sys_ConsoleInit();
@@ -52,6 +67,7 @@ void Task_LED(void)
   static clock_t t0;    // Duruma ilk geçiþ saati
   clock_t t1;           // Güncel saat deðeri
   
+  
   t1 = clock();
   
   switch (state) {
@@ -75,6 +91,36 @@ void Task_LED(void)
       state = I_LED_OFF;
     break;
   }  
+}
+
+void speedmeter(uint8_t color)
+{
+  if(color == GREEN_1){
+    IO_Write(IOP_LED_GREEN_1, 1);
+    IO_Write(IOP_LED_GREEN_2, 0);
+    IO_Write(IOP_LED_YELLOW, 0);
+    IO_Write(IOP_LED_RED, 0);
+  }else if(color == GREEN_2){
+    IO_Write(IOP_LED_GREEN_1, 1);
+    IO_Write(IOP_LED_GREEN_2, 1);
+    IO_Write(IOP_LED_YELLOW, 0);
+    IO_Write(IOP_LED_RED, 0);
+  }else if(color == YELLOW){
+    IO_Write(IOP_LED_GREEN_1, 1);
+    IO_Write(IOP_LED_GREEN_2, 1);
+    IO_Write(IOP_LED_YELLOW, 1);
+    IO_Write(IOP_LED_RED, 0);
+  }else if(color == RED){
+    IO_Write(IOP_LED_GREEN_1, 1);
+    IO_Write(IOP_LED_GREEN_2, 1);
+    IO_Write(IOP_LED_YELLOW, 1);
+    IO_Write(IOP_LED_RED, 1);
+  }else{
+    IO_Write(IOP_LED_GREEN_1, 0);
+    IO_Write(IOP_LED_GREEN_2, 0);
+    IO_Write(IOP_LED_YELLOW, 0);
+    IO_Write(IOP_LED_RED, 0);
+  }
 }
 
 void Task_Joystick(void)
@@ -103,24 +149,37 @@ void Task_Joystick(void)
     data_y[1] = (resulty >> 8) & 0x0F; // resulty_high
     data_y[2] = resulty & 0xFF;        // resulty_low 
     
+    if(data_y[1] == 8 || data_y[1] == 9) 
+      speedmeter(GREEN_1);
+    else if(data_y[1] == 10 || data_y[1] == 11)
+      speedmeter(GREEN_2);
+    else if(data_y[1] == 12 || data_y[1] == 13)
+      speedmeter(YELLOW);
+    else if(data_y[1] == 14 || data_y[1] == 15)
+      speedmeter(RED);
+    else
+      speedmeter(NONE);
+    
+    /*
     OLED_SetCursor(0, 0);
     printf("x1=%x x2=%x\n\r", data_x[1], data_x[2]);
     printf("y1=%x y2=%x\n\r", data_y[1], data_y[2]);
     printf("x=%4d\n\r", resultx);
     printf("y=%4d\n\r", resulty);
-
+    */
     /////////////////////////////////////////////////
     nrf24_send(data_x);
     while(nrf24_isSending());
     /* Make analysis on last tranmission attempt */
     temp = nrf24_lastMessageStatus();
 
+    /*
     OLED_SetCursor(4, 0);
     if(temp == NRF24_TRANSMISSON_OK)                  
         printf("X is OK  \n\r");
     else if(temp == NRF24_MESSAGE_LOST)                  
         printf("X is lost\n\r");  
-    
+    */
     //nrf24_powerDown();
     //////////////////////////////////////////////////
 
@@ -130,12 +189,13 @@ void Task_Joystick(void)
     /* Make analysis on last tranmission attempt */
     temp = nrf24_lastMessageStatus();
 
+    /*
     OLED_SetCursor(5, 0);
     if(temp == NRF24_TRANSMISSON_OK)                  
         printf("Y is OK  \n\r");
     else if(temp == NRF24_MESSAGE_LOST)                  
         printf("Y is lost\n\r");      
-    
+    */
     nrf24_powerDown();
     //////////////////////////////////////////////////
     
@@ -154,7 +214,7 @@ int main()
   // Baþlangýç yapýlandýrmalarý
   init();
 
-  OLED_SetFont(FNT_SMALL);
+  //OLED_SetFont(FNT_SMALL);
   
   // Set the device addresses 
   nrf24_tx_address(tx_address);
