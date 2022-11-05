@@ -1,0 +1,4 @@
+08.07 - joystick, oled, nrf içeren proje oluşturuldu.Joystick'ten aldığı bilgileri nrf ile gönderecek.ADC değerini aynı anda OLED'de debug için gösterecek.
+14.07 - joystick'ten analog değerler alınıp oled ekranda yazdırıldı.
+16.07 - joystick'ten alınan analog değerler oled ekranda gösterildi,nRF ile gönderme işlemi yapıldı.RX kısmı yapılması gerek.SPI driver formatı değişti, SPI_2'de eklendi.
+04.08 - oledde düzenleme yapıldı.alt alta satır
