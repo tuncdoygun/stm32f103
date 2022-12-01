@@ -58,6 +58,7 @@ GPIO_TypeDef *_GPIO_Ports[] = {
 
 void IO_Init(int idx, int mode);
 void IO_Write(int idx, int val);
+void IO_Toggle(int idx);
 int IO_Read(int idx); // burda dönüþ deðerinin int veya bool kullanýlmasýnýn farký yok.32 bitte olsa 1 bitte olsa 1 cycle'da iþliyor iþlemci.
 
 #endif

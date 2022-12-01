@@ -30,6 +30,17 @@ void IO_Write(int idx, int val)
     _GPIO_Ports[port]->BRR = (1 << _ios[idx].pin);
 }
 
+void IO_Toggle(int idx)
+{
+  int port, pin_val;
+  
+  port = _ios[idx].port;
+  
+  pin_val = ((_GPIO_Ports[port]->ODR) >>  (_ios[idx].pin)) & 0x0001; 
+  
+  IO_Write(idx, (~pin_val & 0x00000001));
+}
+
 int IO_Read(int idx)
 {
   int port;
