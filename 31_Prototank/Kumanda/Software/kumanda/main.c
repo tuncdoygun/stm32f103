@@ -6,10 +6,11 @@
 #include "io.h"
 #include "adc.h"
 #include "nRF24.h"
+#include "button.h"
 
 #define SYS_CLOCK_FREQ  72000000
-#define JOY_CH_Y        0
-#define JOY_CH_X        1
+#define JOY_CH_HIZ        0
+#define JOY_CH_YON        1
 
 #define NSAMPLES        200
 
@@ -33,8 +34,18 @@ void init(void)
   IO_Write(IOP_LED, 1);
   IO_Init(IOP_LED, IO_MODE_OUTPUT);
   
+  // Joystick button baslangic
+  BTN_InitButtons();
+  
   // Console(oled) baþlangýç
   Sys_ConsoleInit();
+  
+  // init hardware pins
+  nrf24_init();
+    
+  // Channel #2 , payload length: 3
+  nrf24_config(2, 3);
+  DelayMs(10);  
   
   // ADC baslangic
   IADC_IoInit(IOP_JOY_VRX);
@@ -80,6 +91,7 @@ void Task_LED(void)
   }  
 }
 
+/*
 void speedmeter(uint8_t color)
 {
   if(color == GREEN_1){
@@ -109,6 +121,7 @@ void speedmeter(uint8_t color)
     IO_Write(IOP_LED_RED, 0);
   }
 }
+*/
 
 void Task_Joystick(void)
 {
@@ -119,8 +132,8 @@ void Task_Joystick(void)
   uint8_t data_x[3] = {'X', 0, 0};
   uint8_t data_y[3] = {'Y', 0, 0};
   
-  x = IADC_Convert(JOY_CH_X);
-  y = IADC_Convert(JOY_CH_Y);
+  x = IADC_Convert(JOY_CH_YON);
+  y = IADC_Convert(JOY_CH_HIZ);
   
   totalx += x;
   totaly += y;
@@ -134,63 +147,92 @@ void Task_Joystick(void)
     
     resulty = totaly / NSAMPLES;
     data_y[1] = (resulty >> 8) & 0x0F; // resulty_high
-    data_y[2] = resulty & 0xFF;        // resulty_low 
+
+    //printf("x1=%x x2=%x y1=%x y2=%x x=%4d y=%4d\n\r", data_x[1], data_x[2], data_y[1], data_y[2], resultx, resulty);
     
-    if(data_y[1] == 8 || data_y[1] == 9) 
-      speedmeter(GREEN_1);
-    else if(data_y[1] == 10 || data_y[1] == 11)
-      speedmeter(GREEN_2);
-    else if(data_y[1] == 12 || data_y[1] == 13)
-      speedmeter(YELLOW);
-    else if(data_y[1] == 14 || data_y[1] == 15)
-      speedmeter(RED);
-    else
-      speedmeter(NONE);
-    
-    /*
-    OLED_SetCursor(0, 0);
-    printf("x1=%x x2=%x\n\r", data_x[1], data_x[2]);
-    printf("y1=%x y2=%x\n\r", data_y[1], data_y[2]);
-    printf("x=%4d\n\r", resultx);
-    printf("y=%4d\n\r", resulty);
-    */
-    /////////////////////////////////////////////////
+    //////////////////////////////////////////////////
     nrf24_send(data_x);
     while(nrf24_isSending());
     /* Make analysis on last tranmission attempt */
-    temp = nrf24_lastMessageStatus();
-
-    /*
-    OLED_SetCursor(4, 0);
-    if(temp == NRF24_TRANSMISSON_OK)                  
-        printf("X is OK  \n\r");
-    else if(temp == NRF24_MESSAGE_LOST)                  
-        printf("X is lost\n\r");  
-    */
-    //nrf24_powerDown();
+    //temp = nrf24_lastMessageStatus();
     //////////////////////////////////////////////////
 
     //////////////////////////////////////////////////
     nrf24_send(data_y);
     while(nrf24_isSending());
     /* Make analysis on last tranmission attempt */
-    temp = nrf24_lastMessageStatus();
-
-    /*
-    OLED_SetCursor(5, 0);
-    if(temp == NRF24_TRANSMISSON_OK)                  
-        printf("Y is OK  \n\r");
-    else if(temp == NRF24_MESSAGE_LOST)                  
-        printf("Y is lost\n\r");      
-    */
-    nrf24_powerDown();
+    //temp = nrf24_lastMessageStatus();
+    
     //////////////////////////////////////////////////
     
+    nrf24_powerDown();
     DelayUs(10);
     
     totalx = 0;
     totaly = 0;
   }
+}
+
+void Task_Button(void)
+{
+    uint8_t data[3] = {'B', 'T', 0};
+  
+  if (g_Buttons[BTN_UP]){
+    printf("BTN_UP\n");
+    
+    data[2] = 'U';
+    nrf24_send(data);
+    while(nrf24_isSending());    
+    
+    data[2] = 0;
+    g_Buttons[BTN_UP] = 0; //binary semaphore
+  }
+
+  if (g_Buttons[BTN_DOWN]){
+    printf("BTN_DOWN\n");
+    
+    data[2] = 'D';
+    nrf24_send(data);
+    while(nrf24_isSending());    
+    
+    data[2] = 0;
+    g_Buttons[BTN_DOWN] = 0; //binary semaphore
+  }
+
+  if (g_Buttons[BTN_RIGHT]){
+    printf("BTN_RIGHT\n");
+ 
+    data[2] = 'R';
+    nrf24_send(data);
+    while(nrf24_isSending());    
+    
+    data[2] = 0;
+    g_Buttons[BTN_RIGHT] = 0; //binary semaphore
+  }
+
+  if (g_Buttons[BTN_LEFT]){
+    printf("BTN_LEFT\n");
+    
+    data[2] = 'L';
+    nrf24_send(data);
+    while(nrf24_isSending());    
+    
+    data[2] = 0;
+    g_Buttons[BTN_LEFT] = 0; //binary semaphore
+  }
+  
+#ifdef BTN_LONG_PRESS
+  if (g_ButtonsL[BTN_JOY]){
+    printf("BTN_JOY\n");
+    
+    data[2] = 'J';
+    nrf24_send(data);
+    while(nrf24_isSending());    
+    
+    data[2] = 0;  
+    g_ButtonsL[BTN_JOY] = 0; //binary semaphore
+  }
+#endif
 }
 
 int main()
@@ -201,15 +243,21 @@ int main()
   // Baþlangýç yapýlandýrmalarý
   init();
   
+  printf("********** PROTOTANK KUMANDA **********\n");
+  printf("Sistem baslatiliyor...\n");
+  
   // Set the device addresses 
   nrf24_tx_address(tx_address);
   nrf24_rx_address(rx_address);
+  printf("TX Address : E7E7E7E7E7\n");
+  printf("RX Address : D7D7D7D7D7\n");
   
   // Görev çevrimi (Task Loop)
   // Co-Operative Multitasking (Yardýmlaþmalý çoklu görev) 
   while (1)
   {
     Task_LED();
+    Task_Button();
     Task_Joystick();
   }
 }

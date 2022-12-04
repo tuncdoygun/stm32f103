@@ -1963,12 +1963,21 @@
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Libraries\STM32F10x_StdPeriph_Driver\src\stm32f10x_spi.c</name>
     </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Libraries\STM32F10x_StdPeriph_Driver\src\stm32f10x_usart.c</name>
+    </file>
   </group>
   <file>
     <name>$PROJ_DIR$\adc.c</name>
   </file>
   <file>
     <name>$PROJ_DIR$\adc.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\button.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\button.h</name>
   </file>
   <file>
     <name>$PROJ_DIR$\io.c</name>
@@ -1999,6 +2008,12 @@
   </file>
   <file>
     <name>$PROJ_DIR$\system.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\uart.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\uart.h</name>
   </file>
 </project>
 

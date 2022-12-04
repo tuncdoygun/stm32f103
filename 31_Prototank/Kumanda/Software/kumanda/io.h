@@ -34,17 +34,7 @@ typedef struct {
 } IO_PIN;
 
 enum {
-  IOP_LED,      // Blue pill LED
-  IOP_LED_GREEN_1,
-  IOP_LED_GREEN_2,
-  IOP_LED_YELLOW,
-  IOP_LED_RED,
-          
-  // I2C
-  IOP_I2C1_SCL,
-  IOP_I2C1_SDA,
-  IOP_I2C2_SCL,
-  IOP_I2C2_SDA,
+  IOP_LED,              // Blue pill LED
   
   // SPI1
   IOP_SPI_SCK,
@@ -59,44 +49,28 @@ enum {
   // nRF24
   IOP_nRF_CSN,
   IOP_nRF_CE,
-  
-  // OLED
-#ifdef IO_OLED_VDD
-  IOP_OLED_VDD, // yazýlýmsal spi kullanýlacaksa,yani GPIO'ya baðlandýysa
-#endif
-  
-#ifdef IO_OLED_GND
-  IOP_OLED_GND, // yazýlýmsal spi kullanýlacaksa,yani GPIO'ya baðlandýysa
-#endif  
-  
-#ifdef IO_OLED_RES
-  IOP_OLED_RES,
-#endif
-  IOP_OLED_DC,  
-  
-#ifdef IO_OLED_CS
-  IOP_OLED_CS,
-#endif 
+
+  // UART1-console
+  IOP_U1RX,
+  IOP_U1TX,
   
   // Analog input
   IOP_JOY_VRX,
-  IOP_JOY_VRY
+  IOP_JOY_VRY,
+  
+  // Joystick buton
+  IOP_J_BUTTON,
+  
+  IOP_BUTTON_UP,
+  IOP_BUTTON_DOWN,
+  IOP_BUTTON_RIGHT,
+  IOP_BUTTON_LEFT,
 };
 
 // Variable definitions
 #ifdef _IOS_
 IO_PIN _ios[] = {
   { IO_PORT_C, 13 },    // LED
-  { IO_PORT_B, 12 },    // LED GREEN - 1
-  { IO_PORT_A, 8 },     // LED GREEN - 2
-  { IO_PORT_A, 9 },     // LED YELLOW 
-  { IO_PORT_A, 10 },    // LED RED
-  
-  // I2C
-  { IO_PORT_B, 6 },    // SCL1
-  { IO_PORT_B, 7 },    // SDA1
-  { IO_PORT_B, 10 },   // SCL2
-  { IO_PORT_B, 11 },   // SDA2
 
   // SPI
   { IO_PORT_A, 5 },    // SCK
@@ -111,18 +85,20 @@ IO_PIN _ios[] = {
   // nRF24
   {IO_PORT_A, 3}, // CSN
   {IO_PORT_A, 2}, // CE 
-  
-  // OLED  
-#ifdef IO_OLED_RES  
-  {IO_PORT_B, 0}, // RES
-#endif
-  {IO_PORT_B, 1}, // DC
-#ifdef IO_OLED_CS
-  {IO_PORT_A, 3}, // CS
-#endif
+
+  // UART-1
+  {IO_PORT_A, 10}, // RX
+  {IO_PORT_A, 9},  // TX
   
   {IO_PORT_A, 1},    // Analog Input Ch0 - Vrx
   {IO_PORT_A, 0},    // Analog Input Ch1 - Vry
+  
+  {IO_PORT_A, 4}, // Joystick BUTTON
+  
+  {IO_PORT_B, 3}, // BTN_UP
+  {IO_PORT_B, 4}, // BTN_DOWN
+  {IO_PORT_B, 5}, // BTN_RIGHT
+  {IO_PORT_B, 6}, // BTN_LEFT
 };
 
 GPIO_TypeDef    *_GPIO_Ports[] = {
@@ -140,6 +116,7 @@ GPIO_TypeDef    *_GPIO_Ports[] = {
 
 void IO_Init(int idx, int mode);
 void IO_Write(int idx, int val);
+void IO_Toggle(int idx);
 int IO_Read(int idx);
 
 #endif
