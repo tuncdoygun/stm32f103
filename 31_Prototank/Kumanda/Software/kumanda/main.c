@@ -147,7 +147,8 @@ void Task_Joystick(void)
     
     resulty = totaly / NSAMPLES;
     data_y[1] = (resulty >> 8) & 0x0F; // resulty_high
-
+    data_y[2] = resulty & 0xFF;
+    
     //printf("x1=%x x2=%x y1=%x y2=%x x=%4d y=%4d\n\r", data_x[1], data_x[2], data_y[1], data_y[2], resultx, resulty);
     
     //////////////////////////////////////////////////
@@ -177,40 +178,64 @@ void Task_Button(void)
 {
     uint8_t data[3] = {'B', 'T', 0};
   
-  if (g_Buttons[BTN_UP]){
-    printf("BTN_UP\n");
+  if (g_Buttons[BTN_UP] == 1){
+    printf("BTN_UP = HIGH\n");
     
     data[2] = 'U';
     nrf24_send(data);
     while(nrf24_isSending());    
     
     data[2] = 0;
-    g_Buttons[BTN_UP] = 0; //binary semaphore
+  } else if (g_Buttons[BTN_UP] == 2) {
+    printf("BTN_UP = LOW\n");
+    
+    data[2] = 'A';
+    nrf24_send(data);
+    while(nrf24_isSending());    
+    
+    data[2] = 0;    
   }
+  g_Buttons[BTN_UP] = 0;
 
-  if (g_Buttons[BTN_DOWN]){
-    printf("BTN_DOWN\n");
+  if (g_Buttons[BTN_DOWN] == 1){
+    printf("BTN_DOWN = HIGH\n");
     
     data[2] = 'D';
     nrf24_send(data);
     while(nrf24_isSending());    
     
     data[2] = 0;
-    g_Buttons[BTN_DOWN] = 0; //binary semaphore
+  } else if (g_Buttons[BTN_DOWN] == 2){
+    printf("BTN_DOWN = LOW\n");
+    
+    data[2] = 'B';
+    nrf24_send(data);
+    while(nrf24_isSending());    
+    
+    data[2] = 0;    
   }
-
-  if (g_Buttons[BTN_RIGHT]){
-    printf("BTN_RIGHT\n");
+  g_Buttons[BTN_DOWN] = 0;
+  
+  if (g_Buttons[BTN_RIGHT] == 1){
+    printf("BTN_RIGHT = HIGH\n");
  
     data[2] = 'R';
     nrf24_send(data);
     while(nrf24_isSending());    
     
     data[2] = 0;
-    g_Buttons[BTN_RIGHT] = 0; //binary semaphore
+  } else if (g_Buttons[BTN_RIGHT] == 2){
+    printf("BTN_RIGHT = LOW\n");
+ 
+    data[2] = 'C';
+    nrf24_send(data);
+    while(nrf24_isSending());    
+    
+    data[2] = 0;    
   }
-
-  if (g_Buttons[BTN_LEFT]){
+  g_Buttons[BTN_RIGHT] = 0;
+  
+  if (g_Buttons[BTN_LEFT] == 1){
     printf("BTN_LEFT\n");
     
     data[2] = 'L';
@@ -218,8 +243,16 @@ void Task_Button(void)
     while(nrf24_isSending());    
     
     data[2] = 0;
-    g_Buttons[BTN_LEFT] = 0; //binary semaphore
+  } else if (g_Buttons[BTN_LEFT] == 2){
+    printf("BTN_LEFT = LOW\n");
+    
+    data[2] = 'E';
+    nrf24_send(data);
+    while(nrf24_isSending());    
+    
+    data[2] = 0;    
   }
+  g_Buttons[BTN_LEFT] = 0;
   
 #ifdef BTN_LONG_PRESS
   if (g_ButtonsL[BTN_JOY]){
@@ -233,6 +266,9 @@ void Task_Button(void)
     g_ButtonsL[BTN_JOY] = 0; //binary semaphore
   }
 #endif
+  
+  nrf24_powerDown();
+  DelayUs(10);
 }
 
 int main()
@@ -258,7 +294,7 @@ int main()
   {
     Task_LED();
     Task_Button();
-    Task_Joystick();
+    //Task_Joystick();
   }
 }
 

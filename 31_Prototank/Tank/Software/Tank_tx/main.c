@@ -16,8 +16,13 @@
 #define SERVO_LEFT_MAX          3050
 #define SERVO_180               3800
 
-int g_PWMPeriod;
+#define DEBUG
 
+int g_PWMPeriod;
+uint8_t data_array[3];
+char debug_str_x[100], debug_str_y[100];
+int datax, datay, duty_x, duty_y;
+  
 void init(void)
 {
   // System Clock init
@@ -94,21 +99,36 @@ int map(int x, int in_min, int in_max, int out_min, int out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-void Task_Servo(void){
-  uint8_t data_array[3];
-  static char debug_str_x[100], debug_str_y[100];
-  int datax, datay, duty_x, duty_y;
-  
+void clear_buffer(void) {
+  data_array[0] = 0;
+  data_array[1] = 0;
+  data_array[2] = 0;
+}
+
+void Task_NRF(void){
    if(nrf24_dataReady()){
     nrf24_getData(data_array);
     
+#ifdef DEBUG
     printf("> ");
-    printf("%c ",data_array[0]);
-    printf("%c ",data_array[1]);
-    printf("%c\n",data_array[2]);
-    
-    
+    printf("%x ",data_array[0]);
+    printf("%x ",data_array[1]);
+    printf("%x\n",data_array[2]);
+#endif
   }
+}
+
+void Task_tank_led(void){
+  if(data_array[0] == 'B' && data_array[1] == 'T' && data_array[2] == 'J') {
+    IO_Toggle(IOP_LED_BEYAZ);
+    IO_Toggle(IOP_LED_KIRMIZI);
+    
+#ifdef DEBUG
+    printf("LEDS %s\n", IO_Read(IOP_LED_BEYAZ) ? "ON" : "OFF");
+#endif
+    
+    clear_buffer();
+  }  
 }
 
 int main()
@@ -145,8 +165,8 @@ int main()
   while (1)
   {
     Task_LED();  
-    Task_Servo();
-
+    Task_NRF();
+    Task_tank_led();
   }
 }
 

@@ -8,6 +8,7 @@ typedef struct {
   int ioIdx;    // buttonun baðlý olduðu input pin index
   int cState;   // current state, butonun güncel durumu, belirli periyotlarla okuma yapýlacak,o okumanýn deðeri
   int aState;   // active state, aktif durum, aktifken sýfýr mý aktifken 1 mi
+  int pState;   // pasif state
   int dbc;      // debounce counter
 #ifdef BTN_LONG_PRESS
   int acc;    // active counter

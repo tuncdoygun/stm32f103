@@ -7,11 +7,11 @@
 int g_dbMax = 50; // parazit geniþliði.
 int _bScan = 0;   // tarama baþlangýç flag deðeri
 static BTN_PIN _bts[] = {
-  {IOP_J_BUTTON, 1, 0, 0}, // current statelerin 1 olmasýnýn sebebi pullup olmasý
-  {IOP_BUTTON_UP, 1, 0, 0},
-  {IOP_BUTTON_DOWN, 1, 0, 0},
-  {IOP_BUTTON_RIGHT, 1, 0, 0},
-  {IOP_BUTTON_LEFT, 1, 0, 0},
+  {IOP_J_BUTTON, 1, 0, 1, 0}, // current statelerin 1 olmasýnýn sebebi pullup olmasý
+  {IOP_BUTTON_UP, 1, 0, 1, 0},
+  {IOP_BUTTON_DOWN, 1, 0, 1, 0},
+  {IOP_BUTTON_RIGHT, 1, 0, 1, 0},
+  {IOP_BUTTON_LEFT, 1, 0, 1, 0},
 };
 
 #define N_BUTTONS       (sizeof(_bts) / sizeof(BTN_PIN))
@@ -35,12 +35,12 @@ static void BTN_Scan(int btIdx)
      
       if (_bts[btIdx].cState == _bts[btIdx].aState){ // pullup ise aktif state = 0'dýr.
         // Signal mekanizmasý, butona baþarýlý þekilde basýldý.
-        g_Buttons[btIdx] = 1;   // binary semaphore
+        g_Buttons[btIdx] = 1;   // semaphore
         //++g_Buttons[btIdx];     // counting semaphore 
-      }
+      } else if (_bts[btIdx].cState == _bts[btIdx].pState){ // buton býrakýldýðý zaman da iþlem yapmasý için.
+        g_Buttons[btIdx] = 2;   // semaphore
 #ifdef BTN_LONG_PRESS
-      else { 
-       _bts[btIdx].lState = 0;
+       _bts[btIdx].lState = 0; // pasif state inde lState 0 olmasi lazim ki asagida birdaha long press kosuluna girebilsin.
       }
 #endif      
     }
