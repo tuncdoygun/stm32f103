@@ -12,7 +12,10 @@
 #define JOY_CH_HIZ        0
 #define JOY_CH_YON        1
 
-#define NSAMPLES        200
+#define NSAMPLES        5
+
+uint8_t data[3] = {'B', 'T', 0};
+int count, j_mod_count;
 
 enum {
   NONE,
@@ -125,15 +128,14 @@ void speedmeter(uint8_t color)
 
 void Task_Joystick(void)
 {
-  uint8_t temp;
   int x, y, resultx, resulty;
   static int totalx , totaly, n;
   
   uint8_t data_x[3] = {'X', 0, 0};
   uint8_t data_y[3] = {'Y', 0, 0};
   
-  x = IADC_Convert(JOY_CH_YON);
-  y = IADC_Convert(JOY_CH_HIZ);
+  y = IADC_Convert(JOY_CH_YON);
+  x = IADC_Convert(JOY_CH_HIZ);
   
   totalx += x;
   totaly += y;
@@ -152,18 +154,13 @@ void Task_Joystick(void)
     //printf("x1=%x x2=%x y1=%x y2=%x x=%4d y=%4d\n\r", data_x[1], data_x[2], data_y[1], data_y[2], resultx, resulty);
     
     //////////////////////////////////////////////////
-    nrf24_send(data_x);
-    while(nrf24_isSending());
-    /* Make analysis on last tranmission attempt */
-    //temp = nrf24_lastMessageStatus();
+    //nrf24_send(data_x);
+    //while(nrf24_isSending());
     //////////////////////////////////////////////////
 
     //////////////////////////////////////////////////
     nrf24_send(data_y);
-    while(nrf24_isSending());
-    /* Make analysis on last tranmission attempt */
-    //temp = nrf24_lastMessageStatus();
-    
+    while(nrf24_isSending());    
     //////////////////////////////////////////////////
     
     nrf24_powerDown();
@@ -173,102 +170,132 @@ void Task_Joystick(void)
     totaly = 0;
   }
 }
-
-void Task_Button(void)
-{
-    uint8_t data[3] = {'B', 'T', 0};
   
-  if (g_Buttons[BTN_UP] == 1){
+void Task_Button(void)
+{ 
+  if (g_Buttons[BTN_UP] == 1){ // basiliyken surekli gonderiyor.
     printf("BTN_UP = HIGH\n");
     
     data[2] = 'U';
     nrf24_send(data);
-    while(nrf24_isSending());    
-    
+    while(nrf24_isSending()); 
+  
     data[2] = 0;
-  } else if (g_Buttons[BTN_UP] == 2) {
+  } else if (g_Buttons[BTN_UP] == 2) { // butondan el cekildiginde 10 tane durdurma gonderip birakiyor.
     printf("BTN_UP = LOW\n");
     
-    data[2] = 'A';
-    nrf24_send(data);
-    while(nrf24_isSending());    
-    
-    data[2] = 0;    
+    count = 10;
+    data[2] = 'A'; 
+    while(count--){
+      nrf24_send(data);
+      while(nrf24_isSending()); 
+      nrf24_powerDown();
+      DelayUs(10);      
+    }
+    g_Buttons[BTN_UP] = 0; 
+    data[2] = 0;
   }
-  g_Buttons[BTN_UP] = 0;
 
   if (g_Buttons[BTN_DOWN] == 1){
     printf("BTN_DOWN = HIGH\n");
     
     data[2] = 'D';
     nrf24_send(data);
-    while(nrf24_isSending());    
-    
+    while(nrf24_isSending()); 
+  
     data[2] = 0;
   } else if (g_Buttons[BTN_DOWN] == 2){
     printf("BTN_DOWN = LOW\n");
-    
-    data[2] = 'B';
-    nrf24_send(data);
-    while(nrf24_isSending());    
-    
-    data[2] = 0;    
+
+    count = 10;
+    data[2] = 'B'; 
+    while(count--){
+      nrf24_send(data);
+      while(nrf24_isSending()); 
+      nrf24_powerDown();
+      DelayUs(10);      
+    }
+    g_Buttons[BTN_DOWN] = 0; 
+    data[2] = 0;
   }
-  g_Buttons[BTN_DOWN] = 0;
   
   if (g_Buttons[BTN_RIGHT] == 1){
     printf("BTN_RIGHT = HIGH\n");
  
     data[2] = 'R';
     nrf24_send(data);
-    while(nrf24_isSending());    
-    
+    while(nrf24_isSending()); 
+  
     data[2] = 0;
   } else if (g_Buttons[BTN_RIGHT] == 2){
     printf("BTN_RIGHT = LOW\n");
- 
-    data[2] = 'C';
-    nrf24_send(data);
-    while(nrf24_isSending());    
-    
-    data[2] = 0;    
+
+    count = 10;
+    data[2] = 'C'; 
+    while(count--){
+      nrf24_send(data);
+      while(nrf24_isSending()); 
+      nrf24_powerDown();
+      DelayUs(10);      
+    }
+    g_Buttons[BTN_RIGHT] = 0; 
+    data[2] = 0;
   }
-  g_Buttons[BTN_RIGHT] = 0;
   
   if (g_Buttons[BTN_LEFT] == 1){
-    printf("BTN_LEFT\n");
+    printf("BTN_LEFT = HIGH\n");
     
     data[2] = 'L';
     nrf24_send(data);
-    while(nrf24_isSending());    
-    
+    while(nrf24_isSending()); 
+  
     data[2] = 0;
   } else if (g_Buttons[BTN_LEFT] == 2){
     printf("BTN_LEFT = LOW\n");
-    
-    data[2] = 'E';
-    nrf24_send(data);
-    while(nrf24_isSending());    
-    
-    data[2] = 0;    
+
+    count = 10;
+    data[2] = 'E'; 
+    while(count--){
+      nrf24_send(data);
+      while(nrf24_isSending()); 
+      nrf24_powerDown();
+      DelayUs(10);      
+    }
+    g_Buttons[BTN_LEFT] = 0; 
+    data[2] = 0;
   }
-  g_Buttons[BTN_LEFT] = 0;
   
 #ifdef BTN_LONG_PRESS
   if (g_ButtonsL[BTN_JOY]){
     printf("BTN_JOY\n");
+    ++j_mod_count;
     
-    data[2] = 'J';
-    nrf24_send(data);
-    while(nrf24_isSending());    
+    if(j_mod_count % 2){
+      count = 10;
+      data[2] = 'J';
+      while(count--){
+        nrf24_send(data);
+        while(nrf24_isSending()); 
+        nrf24_powerDown();
+        DelayUs(10);
+      }
+      data[2] = 0;
+    } else {
+      count = 10;
+      data[2] = 'M';
+      while(count--){
+        nrf24_send(data);
+        while(nrf24_isSending()); 
+        nrf24_powerDown();
+        DelayUs(10);
+      }
+      data[2] = 0;   
+    }
     
-    data[2] = 0;  
     g_ButtonsL[BTN_JOY] = 0; //binary semaphore
   }
 #endif
-  
-  nrf24_powerDown();
-  DelayUs(10);
+
 }
 
 int main()
@@ -294,7 +321,7 @@ int main()
   {
     Task_LED();
     Task_Button();
-    //Task_Joystick();
+    Task_Joystick();
   }
 }
 

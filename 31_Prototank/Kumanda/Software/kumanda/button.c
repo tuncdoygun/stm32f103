@@ -3,8 +3,9 @@
 
 #include "io.h"
 #include "button.h"
+#include "uart.h"
 
-int g_dbMax = 50; // parazit geniþliði.
+int g_dbMax = 10; // parazit geniþliði.
 int _bScan = 0;   // tarama baþlangýç flag deðeri
 static BTN_PIN _bts[] = {
   {IOP_J_BUTTON, 1, 0, 1, 0}, // current statelerin 1 olmasýnýn sebebi pullup olmasý
@@ -41,8 +42,8 @@ static void BTN_Scan(int btIdx)
         g_Buttons[btIdx] = 2;   // semaphore
 #ifdef BTN_LONG_PRESS
        _bts[btIdx].lState = 0; // pasif state inde lState 0 olmasi lazim ki asagida birdaha long press kosuluna girebilsin.
-      }
-#endif      
+#endif 
+      }     
     }
   } else {
     // max baþarý sayýsýna ulaþýlamadan hata geldi.
