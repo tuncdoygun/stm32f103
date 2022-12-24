@@ -84,8 +84,8 @@ IO_PIN _ios[] = {
   { IO_PORT_B, 15 },    // MOSI  
 
   // nRF24
-  {IO_PORT_B, 1}, // CSN
-  {IO_PORT_B, 0}, // CE  
+  {IO_PORT_B, 3}, // CSN
+  {IO_PORT_A, 8}, // CE  
   
   // UART-1
   {IO_PORT_A, 10}, // RX

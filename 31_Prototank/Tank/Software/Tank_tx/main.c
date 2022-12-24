@@ -120,11 +120,20 @@ void Task_NRF(void){
 
 void Task_tank_led(void){
   if(data_array[0] == 'B' && data_array[1] == 'T' && data_array[2] == 'J') {
-    IO_Toggle(IOP_LED_BEYAZ);
-    IO_Toggle(IOP_LED_KIRMIZI);
+    IO_Write(IOP_LED_KIRMIZI, 1);
+    IO_Write(IOP_LED_BEYAZ, 1);
     
 #ifdef DEBUG
-    printf("LEDS %s\n", IO_Read(IOP_LED_BEYAZ) ? "ON" : "OFF");
+    printf("LEDS ON\n");
+#endif
+    
+    clear_buffer();
+  } else if(data_array[0] == 'B' && data_array[1] == 'T' && data_array[2] == 'M') {
+    IO_Write(IOP_LED_KIRMIZI, 0);
+    IO_Write(IOP_LED_BEYAZ, 0);
+    
+#ifdef DEBUG
+    printf("LEDS OFF\n");
 #endif
     
     clear_buffer();
