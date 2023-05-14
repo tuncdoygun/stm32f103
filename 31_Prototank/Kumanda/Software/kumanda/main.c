@@ -12,7 +12,7 @@
 #define JOY_CH_HIZ        0
 #define JOY_CH_YON        1
 
-#define NSAMPLES        5
+#define NSAMPLES        50
 
 uint8_t data[3] = {'B', 'T', 0};
 int count, j_mod_count;
@@ -46,8 +46,8 @@ void init(void)
   // init hardware pins
   nrf24_init();
     
-  // Channel #2 , payload length: 3
-  nrf24_config(2, 3);
+  // Channel #2 , payload length: 6
+  nrf24_config(2, 6);
   DelayMs(10);  
   
   // ADC baslangic
@@ -131,12 +131,13 @@ void Task_Joystick(void)
   int x, y, resultx, resulty;
   static int totalx , totaly, n;
   
-  uint8_t data_x[3] = {'X', 0, 0};
-  uint8_t data_y[3] = {'Y', 0, 0};
+  //uint8_t data_x[3] = {'X', 0, 0};
+  //uint8_t data_y[3] = {'Y', 0, 0};
+  uint8_t data[6] = {'X', 'Y', 0, 0, 0, 0};
   
   y = IADC_Convert(JOY_CH_YON);
   x = IADC_Convert(JOY_CH_HIZ);
-  
+ 
   totalx += x;
   totaly += y;
   
@@ -144,27 +145,30 @@ void Task_Joystick(void)
     n = 0;
     
     resultx = totalx / NSAMPLES;
-    data_x[1] = (resultx >> 8) & 0x0F; // resultx_high
-    data_x[2] = resultx & 0xFF;        // resultx_low
+    //data_x[1] = (resultx >> 8) & 0x0F; // resultx_high
+    //data_x[2] = resultx & 0xFF;        // resultx_low
     
     resulty = totaly / NSAMPLES;
-    data_y[1] = (resulty >> 8) & 0x0F; // resulty_high
-    data_y[2] = resulty & 0xFF;
+    //data_y[1] = (resulty >> 8) & 0x0F; // resulty_high
+    //data_y[2] = resulty & 0xFF;
     
-    //printf("x1=%x x2=%x y1=%x y2=%x x=%4d y=%4d\n\r", data_x[1], data_x[2], data_y[1], data_y[2], resultx, resulty);
     
+    data[2] = (resultx >> 8) & 0x0F;
+    data[3] = resultx & 0xFF; 
+    data[4] = (resulty >> 8) & 0x0F;
+    data[5] = resulty & 0xFF;
+    printf("x1=%x x2=%x y1=%x y2=%x x=%4d y=%4d\n\r", data[2], data[3], data[4], data[5], resultx, resulty);
     //////////////////////////////////////////////////
-    //nrf24_send(data_x);
-    //while(nrf24_isSending());
+    nrf24_send(data);
+    while(nrf24_isSending());
     //////////////////////////////////////////////////
 
     //////////////////////////////////////////////////
-    nrf24_send(data_y);
-    while(nrf24_isSending());    
+    /*nrf24_send(data_y);
+    while(nrf24_isSending());    */
     //////////////////////////////////////////////////
-    
     nrf24_powerDown();
-    DelayUs(10);
+    DelayMs(10);
     
     totalx = 0;
     totaly = 0;
@@ -184,16 +188,17 @@ void Task_Button(void)
   } else if (g_Buttons[BTN_UP] == 2) { // butondan el cekildiginde 10 tane durdurma gonderip birakiyor.
     printf("BTN_UP = LOW\n");
     
-    count = 10;
+    /*count = 0;
     data[2] = 'A'; 
     while(count--){
       nrf24_send(data);
       while(nrf24_isSending()); 
       nrf24_powerDown();
       DelayUs(10);      
-    }
-    g_Buttons[BTN_UP] = 0; 
+    }*/
+    
     data[2] = 0;
+    g_Buttons[BTN_UP] = 0; 
   }
 
   if (g_Buttons[BTN_DOWN] == 1){
@@ -207,14 +212,14 @@ void Task_Button(void)
   } else if (g_Buttons[BTN_DOWN] == 2){
     printf("BTN_DOWN = LOW\n");
 
-    count = 10;
+    /*count = 0;
     data[2] = 'B'; 
     while(count--){
       nrf24_send(data);
       while(nrf24_isSending()); 
       nrf24_powerDown();
       DelayUs(10);      
-    }
+    }*/
     g_Buttons[BTN_DOWN] = 0; 
     data[2] = 0;
   }
@@ -230,14 +235,14 @@ void Task_Button(void)
   } else if (g_Buttons[BTN_RIGHT] == 2){
     printf("BTN_RIGHT = LOW\n");
 
-    count = 10;
+    /*count = 10;
     data[2] = 'C'; 
     while(count--){
       nrf24_send(data);
       while(nrf24_isSending()); 
       nrf24_powerDown();
       DelayUs(10);      
-    }
+    }*/
     g_Buttons[BTN_RIGHT] = 0; 
     data[2] = 0;
   }
@@ -253,14 +258,14 @@ void Task_Button(void)
   } else if (g_Buttons[BTN_LEFT] == 2){
     printf("BTN_LEFT = LOW\n");
 
-    count = 10;
+    /*count = 10;
     data[2] = 'E'; 
     while(count--){
       nrf24_send(data);
       while(nrf24_isSending()); 
       nrf24_powerDown();
       DelayUs(10);      
-    }
+    }*/
     g_Buttons[BTN_LEFT] = 0; 
     data[2] = 0;
   }

@@ -59,19 +59,24 @@ enum {
   // TIM2_CH3 pwm cikisi
   IOP_PWM_SERVO_1,
   
-  // TIM2_CH2 pwm cikisi
+  // TIM4_CH2 pwm cikisi
   IOP_PWM_DC_2,
   
-  // TIM2_CH1 pwm cikisi
-  IOP_PWM_DC_1,    
+  // TIM4_CH1 pwm cikisi
+  IOP_PWM_DC_1,  
+
+  IOP_IN4,
+  IOP_IN3,
+  IOP_IN2,
+  IOP_IN1
 };
 
 #ifdef _IOS_ // birkere tanýmlanmasý gereken
 
 IO_PIN _ios[] = {
   {IO_PORT_C, 13},
-  { IO_PORT_B, 10 },    // LED-BEYAZ
-  { IO_PORT_B, 11 },    // LED-KIRMIZI
+  { IO_PORT_B, 11 },    // LED-BEYAZ
+  { IO_PORT_B, 10 },    // LED-KIRMIZI
   
   // SPI1
   {IO_PORT_A, 5}, // SCK
@@ -84,7 +89,7 @@ IO_PIN _ios[] = {
   { IO_PORT_B, 15 },    // MOSI  
 
   // nRF24
-  {IO_PORT_B, 3}, // CSN
+  {IO_PORT_A, 11}, // CSN
   {IO_PORT_A, 8}, // CE  
   
   // UART-1
@@ -97,11 +102,16 @@ IO_PIN _ios[] = {
   // TIM2_CH3 PWM-S-1 cikisi
   {IO_PORT_A, 2}, // servo 1
   
-  // TIM2_CH2 PWM-DC-2 cikisi
-  {IO_PORT_A, 1}, // dc motor 2
+  // TIM4_CH2 PWM-DC-2 cikisi
+  {IO_PORT_B, 7}, // dc motor 2
 
-  // TIM2_CH1 PWM-DC-1 cikisi
-  {IO_PORT_A, 0}, // dc motor 1   
+  // TIM4_CH1 PWM-DC-1 cikisi
+  {IO_PORT_B, 6}, // dc motor 1 
+
+  {IO_PORT_B, 8}, // in4
+  {IO_PORT_B, 5}, // in3
+  {IO_PORT_B, 4}, // in2
+  {IO_PORT_B, 3}, // in1
 };
 
 GPIO_TypeDef *_GPIO_Ports[] = {

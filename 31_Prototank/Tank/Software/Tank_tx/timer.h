@@ -9,8 +9,8 @@ enum {
 };
 
 enum {
-  TIM2_CH_1,
-  TIM2_CH_2,
+  TIM4_CH_1,
+  TIM4_CH_2,
   TIM2_CH_3,
   TIM2_CH_4,
 };
@@ -22,7 +22,7 @@ void Timer_Init(int tmNo, unsigned prescale, unsigned period,
 void Timer_Start(int tmNo, int bStart);
 void Timer_Reset(int tmNo);
 void Timer_IntConfig(int tmNo, int priority);
-int PWM_Init(int freq, int duty, int ch);
+int PWM_Init(int freq, int duty, int tim, int ch);
 void PWM_Duty(int duty, int ch);
 
 #endif

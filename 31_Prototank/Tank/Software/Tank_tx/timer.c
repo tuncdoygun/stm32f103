@@ -82,18 +82,19 @@ void Timer_IntConfig(int tmNo, int priority)
 // zorunludur.Farklý bir frekans PWM gerekiyorsa farkli timer kullanilmali.
 // freq: PWM frekansý
 // duty: PWM duty cycle % olarak
+// tim: TIMER_X
 // ch: timer2 channel
-int PWM_Init(int freq, int duty, int ch)
+int PWM_Init(int freq, int duty, int tim, int ch)
 {
   //SystemCoreClock
   uint32_t period, prescale;
   
   // 1) Çýkýþ kanalýnýn I/O ayarlarý
   switch(ch) {
-  case TIM2_CH_1:
+  case TIM4_CH_1:
     IO_Init(IOP_PWM_DC_1, IO_MODE_ALTERNATE);  
     break;
-  case TIM2_CH_2:
+  case TIM4_CH_2:
     IO_Init(IOP_PWM_DC_2, IO_MODE_ALTERNATE);
     break;
   case TIM2_CH_3:
@@ -118,7 +119,7 @@ int PWM_Init(int freq, int duty, int ch)
   else
     prescale = 1;
     
-  Timer_Init(TIMER_2, prescale, period, 1);
+  Timer_Init(tim, prescale, period, 1);
   
   // 3) PWM ayarlarý
   // Output compare
@@ -131,11 +132,11 @@ int PWM_Init(int freq, int duty, int ch)
   ocInit.TIM_Pulse = period * duty / 100;
   
   switch(ch) {
-  case TIM2_CH_1:
-    TIM_OC1Init(TIM2, &ocInit);  
+  case TIM4_CH_1:
+    TIM_OC1Init(TIM4, &ocInit);  
     break;
-  case TIM2_CH_2:
-    TIM_OC2Init(TIM2, &ocInit);
+  case TIM4_CH_2:
+    TIM_OC2Init(TIM4, &ocInit);
     break;
   case TIM2_CH_3:
     TIM_OC3Init(TIM2, &ocInit);
@@ -147,7 +148,7 @@ int PWM_Init(int freq, int duty, int ch)
   
   
   // 4) Timer'ý çalýþtýrýyoruz
-  Timer_Start(TIMER_2, 1);
+  Timer_Start(tim, 1);
   
   return period;
 }
@@ -155,11 +156,11 @@ int PWM_Init(int freq, int duty, int ch)
 void PWM_Duty(int duty, int ch)
 {
   switch(ch) {
-  case TIM2_CH_1:
-    TIM_SetCompare1(TIM2, duty);
+  case TIM4_CH_1:
+    TIM_SetCompare1(TIM4, duty);
     break;
-  case TIM2_CH_2:
-    TIM_SetCompare2(TIM2, duty);
+  case TIM4_CH_2:
+    TIM_SetCompare2(TIM4, duty);
     break;
   case TIM2_CH_3:
     TIM_SetCompare3(TIM2, duty);
